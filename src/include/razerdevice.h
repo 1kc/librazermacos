@@ -4,6 +4,9 @@
 //
 //
 
+#ifndef DRIVER_RAZERDEVICE_H_
+#define DRIVER_RAZERDEVICE_H_
+
 #include <IOKit/usb/IOUSBLib.h>
 #include <IOKit/IOCFPlugIn.h>
 #include <stdio.h>
@@ -46,3 +49,5 @@ void closeRazerUSBDeviceInterface(IOUSBDeviceInterface **dev);
 
 RazerDevices getAllRazerDevices();
 void closeAllRazerDevices(RazerDevices devices);
+
+#endif
