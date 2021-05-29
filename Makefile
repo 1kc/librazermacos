@@ -1,3 +1,5 @@
+.PHONY: all clean re
+
 NAME=razermacos
 LIB_TARGET_NAME=lib$(NAME).so
 SRC=src
@@ -5,8 +7,11 @@ LIB=lib
 OBJ=obj
 INCLUDE=include
 
-LIBRARY_SOURCES=$(wildcard $(SRC)/$(LIB)/*.c)
-OBJECTS=$(patsubst $(SRC)/$(LIB)/%.c, $(OBJ)/%.o, $(LIBRARY_SOURCES))
+LIB_SOURCES=$(wildcard $(SRC)/$(LIB)/*.c)
+LIB_OBJECTS=$(patsubst $(SRC)/$(LIB)/%.c, $(OBJ)/%.o, $(LIB_SOURCES))
+
+CLI_SOURCES=$(wildcard $(SRC)/*.c)
+CLI_OBJECTS=$(patsubst $(SRC)//%.c, $(OBJ)/%.o, $(CLI_SOURCES))
 
 GREEN=\033[0;32m
 BLUE=\033[0;34m
@@ -18,24 +23,23 @@ CC=gcc
 CFLAGS=-Wall -framework CoreFoundation -framework IOKit 
 
 
-# all: $(LIB_TARGET_NAME)
-all: cli
+all: sample_cli
 
 clean:
-	@rm -f $(OBJECTS) $(LIB_TARGET_NAME)
+	@rm -f $(LIB_OBJECTS) $(LIB_TARGET_NAME)
 	@printf "$(BLUE) ✗ Deletion of object files\n";
-	@printf "$(RED) ✗ Deletion of $(NAME)\n";
-
+	@printf "$(RED) ✗ Deletion of $(LIB_TARGET_NAME)\n";
+	@printf "$(RED) ✗ Deletion of sample_cli\n";
 
 # Remake
 re: clean all
 
-cli: $(LIB_TARGET_NAME)
-	@$(CC) $(CFLAGS) -L. -I$(SRC)/$(INCLUDE) -o cli $(SRC)/cli.c -l$(NAME)
-	@printf "$(GREEN) ✓ Building cli\n"
-        
+sample_cli: $(LIB_TARGET_NAME) $(CLI_OBJECTS)
+	@$(CC) $(CFLAGS) -L. -I$(SRC)/$(INCLUDE) -o sample_cli $(SRC)/sample_cli.c -l$(NAME)
+	@printf "$(GREEN) ✓ Building sample_cli\n"
 
-$(LIB_TARGET_NAME): $(OBJECTS)
+
+$(LIB_TARGET_NAME): $(LIB_OBJECTS)
 	@$(CC) $(CFLAGS) -fPIC -o $@ $^ -shared
 	@printf "$(GREEN) ✓ Building $(LIB_TARGET_NAME)\n"
  
