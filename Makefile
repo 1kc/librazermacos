@@ -18,10 +18,11 @@ BLUE=\033[0;34m
 RED=\033[0;31m
 
 CC=gcc
-# Flags and Header
-# CFLAGS=-Wall -Wextra -Werror -framework CoreFoundation -framework IOKit 
-CFLAGS=-Wall -framework CoreFoundation -framework IOKit 
 
+# Flags and Header
+ARCHFLAGS=-arch arm64 -arch x86_64
+OSFLAGS=-mmacosx-version-min=10.5
+CFLAGS=-Wall -framework CoreFoundation -framework IOKit 
 
 all: sample_cli
 
@@ -35,16 +36,16 @@ clean:
 re: clean all
 
 sample_cli: $(LIB_TARGET_NAME) $(CLI_OBJECTS)
-	@$(CC) $(CFLAGS) -L. -I$(SRC)/$(INCLUDE) -o sample_cli $(SRC)/sample_cli.c -l$(NAME)
+	@$(CC) $(ARCHFLAGS) $(OSFLAGS) $(CFLAGS) -L. -I$(SRC)/$(INCLUDE) -o sample_cli $(SRC)/sample_cli.c -l$(NAME)
 	@printf "$(GREEN) ✓ Building sample_cli\n"
 
 
 $(LIB_TARGET_NAME): $(LIB_OBJECTS)
-	@$(CC) $(CFLAGS) -fPIC -o $@ $^ -shared
+	@$(CC) $(ARCHFLAGS) $(OSFLAGS) $(CFLAGS) -fPIC -o $@ $^ -shared
 	@printf "$(GREEN) ✓ Building $(LIB_TARGET_NAME)\n"
  
 $(OBJ)/%.o: $(SRC)/$(LIB)/%.c | $(OBJ)
-	@$(CC) -I$(SRC)/$(INCLUDE) -c $< -o $@
+	@$(CC) $(ARCHFLAGS) $(OSFLAGS) -I$(SRC)/$(INCLUDE) -c $< -o $@
 	@printf "$(GREEN) ✓ Building $@\n"
 
 $(OBJ):
