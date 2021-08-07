@@ -1,3 +1,4 @@
 obj
 *.so
 sample_cli
+.idea
