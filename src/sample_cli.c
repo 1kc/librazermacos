@@ -16,7 +16,7 @@ int main(int argc, const char * argv[]) {
         if (device.productId == 0x025A)
         {
             printf("Found blackwidow v3 pro keyboard (wired)\n");
-            razer_attr_write_mode_spectrum(device.usbDevice, "1", 0);
+            razer_attr_write_mode_wave(device.usbDevice, "1", 0, 0x90);
         }
     }
 
