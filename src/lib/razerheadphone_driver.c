@@ -231,6 +231,9 @@ ssize_t razer_headphone_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev,
             report.transaction_id.id = 0x1F;
             razer_send_payload(usb_dev, &report);
             break;
+        default:
+            printf("razerheadphone: Unknown device\n");
+            break;
     }
 
 
@@ -257,6 +260,9 @@ ssize_t razer_headphone_attr_write_mode_wave(IOUSBDeviceInterface **usb_dev, con
             report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, speed);
             report.transaction_id.id = 0x1F;
             razer_send_payload(usb_dev, &report);
+            break;
+        default:
+            printf("razerheadphone: Unknown device\n");
             break;
     }
 
@@ -305,6 +311,10 @@ ssize_t razer_headphone_attr_write_mode_starlight(IOUSBDeviceInterface **usb_dev
                     break;
             }
             break;
+        default:
+            printf("razerheadphone: Unknown device\n");
+            break;
+
     }
 
     return count;

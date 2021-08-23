@@ -22,7 +22,7 @@ CC=gcc
 # Flags and Header
 ARCHFLAGS=-arch arm64 -arch x86_64
 OSFLAGS=-mmacosx-version-min=10.5
-CFLAGS=-Wall -framework CoreFoundation -framework IOKit 
+CFLAGS=-Wall -Wextra -framework CoreFoundation -framework IOKit 
 
 all: sample_cli
 
