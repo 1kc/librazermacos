@@ -211,111 +211,13 @@ ssize_t razer_headphone_attr_write_mode_static_no_store(IOUSBDeviceInterface **u
     return count;
 }
 
-/**
- * Write device file "mode_spectrum"
- *
- * Spectrum effect mode is activated whenever the file is written to
- */
 ssize_t razer_headphone_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count)
 {
-    struct razer_report report = {0};
-
     UInt16 product = -1;
     (*usb_dev)->GetDeviceProduct(usb_dev, &product);
-
     switch(product) {
         case USB_DEVICE_ID_RAZER_KRAKEN_V2:
             return razer_kraken_attr_write_mode_spectrum(usb_dev, buf, count);
-        case USB_DEVICE_ID_RAZER_KRAKEN_KITTY_EDITION:
-            report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, ZERO_LED);
-            report.transaction_id.id = 0x1F;
-            razer_send_payload(usb_dev, &report);
-            break;
-        default:
-            printf("razerheadphone: Unknown device\n");
-            break;
     }
-
-
-    return count;
-}
-
-/**
- * Write device file "mode_wave"
- *
- * When 1 is written (as a character, 0x31) the wave effect is displayed moving anti clockwise
- * if 2 is written (0x32) then the wave effect goes clockwise
- *
- */
-ssize_t razer_headphone_attr_write_mode_wave(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count, int speed)
-{
-    unsigned char direction = (unsigned char)strtol(buf, NULL, 10);
-    struct razer_report report;
-
-    UInt16 product = -1;
-    (*usb_dev)->GetDeviceProduct(usb_dev, &product);
-
-    switch (product) {
-        case USB_DEVICE_ID_RAZER_KRAKEN_KITTY_EDITION:
-            report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, speed);
-            report.transaction_id.id = 0x1F;
-            razer_send_payload(usb_dev, &report);
-            break;
-        default:
-            printf("razerheadphone: Unknown device\n");
-            break;
-    }
-
-
-    return count;
-}
-
-/**
-* Write device file "mode_starlight"
-*
-* Starlight effect mode is activated whenever the file is written to
-*
-* 7 bytes, speed, rgb, rgb
-* 4 bytes, speed, rgb
-* 1 byte, speed
-*/
-ssize_t razer_headphone_attr_write_mode_starlight(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count)
-{
-    struct razer_report report = {0};
-
-    UInt16 product = -1;
-    (*usb_dev)->GetDeviceProduct(usb_dev, &product);
-
-    if (count != 1 && count != 4 && count != 7) {
-        printf("razerheadphone: Starlight only accepts Speed (1byte). Speed, RGB (4byte). Speed, RGB, RGB (7byte)");
-        return count;
-    }
-
-    switch (product) {
-        case USB_DEVICE_ID_RAZER_KRAKEN_KITTY_EDITION:
-            switch(count) {
-                case 7:
-                    report = razer_chroma_extended_matrix_effect_starlight_dual(VARSTORE, ZERO_LED, buf[0], (struct razer_rgb *)&buf[1], (struct razer_rgb *)&buf[4]);
-                    report.transaction_id.id = 0x1F;
-                    razer_send_payload(usb_dev, &report);
-                    break;
-                case 4:
-                    report = razer_chroma_extended_matrix_effect_starlight_single(VARSTORE, ZERO_LED, buf[0], (struct razer_rgb *)&buf[1]);
-                    report.transaction_id.id = 0x1F;
-                    razer_send_payload(usb_dev, &report);
-                    break;
-                case 1:
-                    report = razer_chroma_extended_matrix_effect_starlight_random(VARSTORE, ZERO_LED, buf[0]);
-                    report.transaction_id.id = 0x1F;
-                    razer_send_payload(usb_dev, &report);
-                    break;
-            }
-            break;
-        default:
-            printf("razerheadphone: Unknown device\n");
-            break;
-
-    }
-
     return count;
 }
