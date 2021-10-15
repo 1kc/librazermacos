@@ -50,7 +50,9 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
     (*usb_dev)->GetDeviceProduct(usb_dev, &product);
 
     switch (product) {
-    // These devices require longer waits to read their firmware, serial, and other setting values
+    case USB_DEVICE_ID_RAZER_BASILISK_V3:
+        return razer_get_usb_response(usb_dev, 0x03, request_report, 0x00, response_report, RAZER_NEW_MOUSE_RECEIVER_WAIT_MIN_US);
+        break;
     case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_RECEIVER:
     case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_WIRED:
     case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS:
@@ -88,6 +90,7 @@ static struct razer_report razer_send_payload(IOUSBDeviceInterface **usb_dev, st
 
     retval = razer_get_report(usb_dev, request_report, &response_report);
 
+
     if(retval == 0) {
         // Check the packet number, class and command are the same
         if(response_report.remaining_packets != request_report->remaining_packets ||
@@ -98,14 +101,17 @@ static struct razer_report razer_send_payload(IOUSBDeviceInterface **usb_dev, st
             //printf("Device is busy (mouse)\n");
         } else if (response_report.status == RAZER_CMD_FAILURE) {
             printf("Command failed (mouse)\n");
+            printf("Contents of request_report are:\ncommand_class: %#04X\ncommand_id: %#04X\ntransaction_id: %#04X\n\n", (unsigned int) request_report->command_class, (unsigned int) request_report->command_id.id, (unsigned int) request_report->transaction_id.id);
         } else if (response_report.status == RAZER_CMD_NOT_SUPPORTED) {
             printf("Command not supported (mouse)\n");
+            printf("Contents of request_report are:\ncommand_class: %#04X\ncommand_id: %#04X\ntransaction_id: %#04X\n\n", (unsigned int) request_report->command_class, (unsigned int) request_report->command_id.id, (unsigned int) request_report->transaction_id.id);
         } else if (response_report.status == RAZER_CMD_TIMEOUT) {
             printf("Command timed out (mouse)\n");
         }
     } else {
         printf("Invalid Report Length (mouse)\n");
     }
+
 
     return response_report;
 }
@@ -134,7 +140,10 @@ ssize_t razer_attr_write_side_mode_wave(IOUSBDeviceInterface **usb_dev, const ch
             report = razer_chroma_extended_matrix_effect_wave(VARSTORE, side, direction, 0x28);
             report.transaction_id.id = 0x1f;
             break;
-
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
+            report = razer_chroma_extended_matrix_effect_wave(VARSTORE, BASILISK_V3_BASE_LED, direction, 0x28);
+            report.transaction_id.id = 0x1f;
+            break;
         default:
             printf("razermouse: logo_mode_wave not supported for this model\n");
             return count;
@@ -191,6 +200,11 @@ ssize_t razer_attr_write_side_mode_static(IOUSBDeviceInterface **usb_dev, const 
             case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
             case USB_DEVICE_ID_RAZER_BASILISK_V2:
                 report = razer_chroma_extended_matrix_effect_static(VARSTORE, side, (struct razer_rgb*)&buf[0]);
+                report.transaction_id.id = 0x1f;
+                break;
+
+            case USB_DEVICE_ID_RAZER_BASILISK_V3:
+               report = razer_chroma_extended_matrix_effect_static(VARSTORE, BASILISK_V3_BASE_LED, (struct razer_rgb*)&buf[0]);
                 report.transaction_id.id = 0x1f;
                 break;
 
@@ -256,6 +270,11 @@ ssize_t razer_attr_write_side_mode_static_no_store(IOUSBDeviceInterface **usb_de
                 report.transaction_id.id = 0x1f;
                 break;
 
+            case USB_DEVICE_ID_RAZER_BASILISK_V3:
+               report = razer_chroma_extended_matrix_effect_static(VARSTORE, BASILISK_V3_BASE_LED, (struct razer_rgb*)&buf[0]);
+                report.transaction_id.id = 0x1f;
+                break;
+
             default:
                 printf("razermouse: side_mode_static_no_store not supported for this model\n");
                 return count;
@@ -312,6 +331,11 @@ ssize_t razer_attr_write_side_mode_spectrum(IOUSBDeviceInterface **usb_dev, cons
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
             report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, side);
+            report.transaction_id.id = 0x1f;
+            break;
+
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
+            report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, BASILISK_V3_BASE_LED);
             report.transaction_id.id = 0x1f;
             break;
 
@@ -457,9 +481,13 @@ ssize_t razer_attr_write_side_mode_none(IOUSBDeviceInterface **usb_dev, const ch
             report = razer_chroma_extended_matrix_effect_none(VARSTORE, side);
             report.transaction_id.id = 0x1f;
             break;
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
+            report = razer_chroma_extended_matrix_effect_none(VARSTORE, BASILISK_V3_BASE_LED);
+            report.transaction_id.id = 0x1f;
+            break;
 
         default:
-            printf("razermouse: logo_mode_none not supported for this model\n");
+            printf("razermouse: side_mode_none not supported for this model\n");
             return count;
     }
 
@@ -493,6 +521,7 @@ ssize_t razer_attr_write_logo_mode_wave(IOUSBDeviceInterface **usb_dev, const ch
 
     case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
     case USB_DEVICE_ID_RAZER_BASILISK_V2:
+    case USB_DEVICE_ID_RAZER_BASILISK_V3:
         report = razer_chroma_extended_matrix_effect_wave(VARSTORE, LOGO_LED, direction, 0x28);
         report.transaction_id.id = 0x1f;
         break;
@@ -532,6 +561,7 @@ ssize_t razer_attr_write_scroll_mode_wave(IOUSBDeviceInterface **usb_dev, const 
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_effect_wave(VARSTORE, SCROLL_WHEEL_LED, direction, 0x28);
             report.transaction_id.id = 0x1f;
             break;
@@ -616,6 +646,7 @@ ssize_t razer_attr_write_logo_mode_static(IOUSBDeviceInterface **usb_dev, const 
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_effect_static(VARSTORE, LOGO_LED, (struct razer_rgb*)&buf[0]);
             report.transaction_id.id = 0x1f;
             break;
@@ -686,6 +717,7 @@ ssize_t razer_attr_write_scroll_mode_static(IOUSBDeviceInterface **usb_dev, cons
 
             case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
             case USB_DEVICE_ID_RAZER_BASILISK_V2:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3:
                 report = razer_chroma_extended_matrix_effect_static(VARSTORE, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
                 report.transaction_id.id = 0x1f;
                 break;
@@ -781,6 +813,7 @@ ssize_t razer_attr_write_logo_mode_static_no_store(IOUSBDeviceInterface **usb_de
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_effect_static(NOSTORE, LOGO_LED, (struct razer_rgb*)&buf[0]);
             report.transaction_id.id = 0x1f;
             break;
@@ -854,6 +887,7 @@ ssize_t razer_attr_write_scroll_mode_static_no_store(IOUSBDeviceInterface **usb_
 
             case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
             case USB_DEVICE_ID_RAZER_BASILISK_V2:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3:
                 report = razer_chroma_extended_matrix_effect_static(NOSTORE, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
                 report.transaction_id.id = 0x1f;
                 break;
@@ -943,6 +977,7 @@ ssize_t razer_attr_write_logo_mode_spectrum(IOUSBDeviceInterface **usb_dev, cons
 
     case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
     case USB_DEVICE_ID_RAZER_BASILISK_V2:
+    case USB_DEVICE_ID_RAZER_BASILISK_V3:
         report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, LOGO_LED);
         report.transaction_id.id = 0x1f;
         break;
@@ -1003,6 +1038,7 @@ ssize_t razer_attr_write_scroll_mode_spectrum(IOUSBDeviceInterface **usb_dev, co
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, SCROLL_WHEEL_LED);
             report.transaction_id.id = 0x1f;
             break;
@@ -1286,6 +1322,7 @@ ssize_t razer_attr_write_logo_mode_none(IOUSBDeviceInterface **usb_dev, const ch
 
     case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
     case USB_DEVICE_ID_RAZER_BASILISK_V2:
+    case USB_DEVICE_ID_RAZER_BASILISK_V3:
         report = razer_chroma_extended_matrix_effect_none(VARSTORE, LOGO_LED);
         report.transaction_id.id = 0x1f;
         break;
@@ -1349,6 +1386,7 @@ ssize_t razer_attr_write_scroll_mode_none(IOUSBDeviceInterface **usb_dev, const 
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_effect_none(VARSTORE, SCROLL_WHEEL_LED);
             report.transaction_id.id = 0x1f;
             break;
@@ -1479,9 +1517,6 @@ ssize_t razer_attr_write_logo_mode_reactive(IOUSBDeviceInterface **usb_dev, cons
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
-            report = razer_chroma_extended_matrix_effect_reactive(VARSTORE, LOGO_LED, speed, (struct razer_rgb*)&buf[1]);
-            report.transaction_id.id = 0x1f;
-            break;
 
         default:
             printf("razermouse: logo_mode_reactive not supported for this model\n");
@@ -1534,9 +1569,7 @@ ssize_t razer_attr_write_scroll_mode_reactive(IOUSBDeviceInterface **usb_dev, co
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
-            report = razer_chroma_extended_matrix_effect_reactive(VARSTORE, SCROLL_WHEEL_LED, speed, (struct razer_rgb*)&buf[1]);
-            report.transaction_id.id = 0x1f;
-            break;
+
 
         default:
             printf("razermouse: scroll_mode_reactive not supported for this model\n");
@@ -1575,7 +1608,6 @@ ssize_t razer_attr_write_side_mode_reactive(IOUSBDeviceInterface **usb_dev, cons
             report = razer_chroma_extended_matrix_effect_reactive(VARSTORE, side, speed, (struct razer_rgb*)&buf[1]);
             report.transaction_id.id = 0x1f;
             break;
-
         default:
             printf("razermouse: left/right mode_reactive not supported for this model\n");
             return count;
@@ -1611,8 +1643,10 @@ ssize_t razer_attr_write_right_mode_reactive(IOUSBDeviceInterface **usb_dev, con
 
 ushort razer_attr_read_dpi(IOUSBDeviceInterface **usb_dev)
 {
-    struct razer_report report, response_report;
+    struct razer_report report;
+    struct razer_report response_report = {0};
     report = razer_chroma_misc_get_dpi_xy(0x01);
+
     response_report = razer_send_payload(usb_dev, &report);
     ushort dpi_x = (response_report.arguments[1] << 8) | (response_report.arguments[2] & 0xFF);
     return dpi_x;
@@ -1734,6 +1768,7 @@ ushort razer_attr_read_poll_rate(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
         case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report.transaction_id.id = 0x1f;
             break;
     }
@@ -1823,6 +1858,7 @@ void razer_attr_write_poll_rate(IOUSBDeviceInterface **usb_dev, ushort polling_r
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
         case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report.transaction_id.id = 0x1f;
             break;
     }
@@ -1958,6 +1994,7 @@ ushort razer_attr_read_scroll_led_brightness(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_get_brightness(VARSTORE, SCROLL_WHEEL_LED);
             report.transaction_id.id = 0x1f;
             break;
@@ -2008,6 +2045,7 @@ void razer_attr_write_scroll_led_brightness(IOUSBDeviceInterface **usb_dev, unsi
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, SCROLL_WHEEL_LED, brightness);
             report.transaction_id.id = 0x1f;
             break;
@@ -2055,6 +2093,7 @@ ushort razer_attr_read_logo_led_brightness(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_get_brightness(VARSTORE, LOGO_LED);
             report.transaction_id.id = 0x1f;
             break;
@@ -2114,6 +2153,7 @@ void razer_attr_write_logo_led_brightness(IOUSBDeviceInterface **usb_dev, unsign
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, LOGO_LED, brightness);
             report.transaction_id.id = 0x1f;
             break;
@@ -2173,6 +2213,11 @@ ushort razer_attr_read_side_led_brightness(IOUSBDeviceInterface **usb_dev, int s
             report.transaction_id.id = 0x1f;
             break;
 
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
+            report = razer_chroma_extended_matrix_get_brightness(VARSTORE, BASILISK_V3_BASE_LED);
+            report.transaction_id.id = 0x1f;
+            break;
+
         default:
             report = razer_chroma_standard_get_led_brightness(VARSTORE, side);
             break;
@@ -2204,6 +2249,11 @@ void razer_attr_write_side_led_brightness(IOUSBDeviceInterface **usb_dev, unsign
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, side, brightness);
+            report.transaction_id.id = 0x1f;
+            break;
+
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
+            report = razer_chroma_extended_matrix_brightness(VARSTORE, BASILISK_V3_BASE_LED, brightness);
             report.transaction_id.id = 0x1f;
             break;
 
