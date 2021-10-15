@@ -1517,6 +1517,9 @@ ssize_t razer_attr_write_logo_mode_reactive(IOUSBDeviceInterface **usb_dev, cons
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+            report = razer_chroma_extended_matrix_effect_reactive(VARSTORE, LOGO_LED, speed, (struct razer_rgb*)&buf[1]);
+            report.transaction_id.id = 0x1f;
+            break;
 
         default:
             printf("razermouse: logo_mode_reactive not supported for this model\n");
@@ -1643,8 +1646,7 @@ ssize_t razer_attr_write_right_mode_reactive(IOUSBDeviceInterface **usb_dev, con
 
 ushort razer_attr_read_dpi(IOUSBDeviceInterface **usb_dev)
 {
-    struct razer_report report;
-    struct razer_report response_report = {0};
+    struct razer_report report, response_report;
     report = razer_chroma_misc_get_dpi_xy(0x01);
 
     response_report = razer_send_payload(usb_dev, &report);
