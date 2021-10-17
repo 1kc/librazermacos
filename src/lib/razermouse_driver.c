@@ -1572,7 +1572,9 @@ ssize_t razer_attr_write_scroll_mode_reactive(IOUSBDeviceInterface **usb_dev, co
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
-
+            report = razer_chroma_extended_matrix_effect_reactive(VARSTORE, SCROLL_WHEEL_LED, speed, (struct razer_rgb*)&buf[1]);
+            report.transaction_id.id = 0x1f;
+            break;
 
         default:
             printf("razermouse: scroll_mode_reactive not supported for this model\n");
