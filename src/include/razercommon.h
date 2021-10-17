@@ -26,18 +26,19 @@
 #define ON  0x01
 
 // LED definitions
-#define ZERO_LED          0x00
-#define SCROLL_WHEEL_LED  0x01
-#define BATTERY_LED       0x03
-#define LOGO_LED          0x04
-#define BACKLIGHT_LED     0x05
-#define MACRO_LED         0x07
-#define GAME_LED          0x08
-#define RED_PROFILE_LED   0x0C
-#define GREEN_PROFILE_LED 0x0D
-#define BLUE_PROFILE_LED  0x0E
-#define RIGHT_SIDE_LED    0x10
-#define LEFT_SIDE_LED     0x11
+#define ZERO_LED             0x00
+#define SCROLL_WHEEL_LED     0x01
+#define BATTERY_LED          0x03
+#define LOGO_LED             0x04
+#define BACKLIGHT_LED        0x05
+#define MACRO_LED            0x07
+#define GAME_LED             0x08
+#define BASILISK_V3_BASE_LED 0x0A
+#define RED_PROFILE_LED      0x0C
+#define GREEN_PROFILE_LED    0x0D
+#define BLUE_PROFILE_LED     0x0E
+#define RIGHT_SIDE_LED       0x10
+#define LEFT_SIDE_LED        0x11
 
 // LED STORAGE Options
 #define NOSTORE          0x00
@@ -90,7 +91,7 @@ union command_id_union {
  * Protocol Type is always 0x00
  * Data Size is the size of payload, cannot be greater than 80. 90 = header (8B) + data + CRC (1B) + Reserved (1B)
  * Command Class is the type of command being issued
- * Command ID is the type of command being send. Direction 0 is Host->Device, Direction 1 is Device->Host. AKA Get LED 0x80, Set LED 0x00
+ * Command ID is the type of command being sent. Direction 0 is Host->Device, Direction 1 is Device->Host. AKA Get LED 0x80, Set LED 0x00
  *
  * */
 
