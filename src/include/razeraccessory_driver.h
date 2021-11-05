@@ -15,6 +15,7 @@
 #ifndef __HID_RAZER_ACCESSORY_H
 #define __HID_RAZER_ACCESSORY_H
 
+#define USB_DEVICE_ID_RAZER_MOUSE_DOCK 0x007E
 #define USB_DEVICE_ID_RAZER_NOMMO_CHROMA 0x0517
 #define USB_DEVICE_ID_RAZER_NOMMO_PRO 0x0518
 #define USB_DEVICE_ID_RAZER_CHROMA_MUG 0x0F07
@@ -22,9 +23,13 @@
 #define USB_DEVICE_ID_RAZER_CHROMA_HDK 0x0F09
 #define USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA 0x0F1D
 #define USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA 0x0F20
+#define USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA 0x0F21
 
 #define RAZER_ACCESSORY_WAIT_MIN_US 600
 #define RAZER_ACCESSORY_WAIT_MAX_US 1000
+
+#define RAZER_NEW_DEVICE_WAIT_MIN_US 31000
+#define RAZER_NEW_DEVICE_WAIT_MAX_US 31100
 
 ssize_t razer_accessory_attr_write_mode_none(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);
 ssize_t razer_accessory_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);

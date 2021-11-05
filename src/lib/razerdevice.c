@@ -216,6 +216,7 @@ bool is_accessory(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_CHROMA_HDK:
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             return true;
     }
 
