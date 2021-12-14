@@ -32,7 +32,18 @@
  */
 static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report *request_report, struct razer_report *response_report)
 {
-    return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_ACCESSORY_WAIT_MIN_US);
+    UInt16 product = -1;
+    (*usb_dev)->GetDeviceProduct(usb_dev, &product);
+
+    switch (product) {
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
+            return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_NEW_DEVICE_WAIT_MIN_US);
+            break;
+
+        default:
+            return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_ACCESSORY_WAIT_MIN_US);
+    }
 }
 
 /**
@@ -90,12 +101,14 @@ ssize_t razer_accessory_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev,
         case USB_DEVICE_ID_RAZER_CHROMA_BASE:
         case USB_DEVICE_ID_RAZER_NOMMO_PRO:
         case USB_DEVICE_ID_RAZER_NOMMO_CHROMA:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
             report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, ZERO_LED);
             report.transaction_id.id = 0x3F;
             break;
 
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, ZERO_LED);
             report.transaction_id.id = 0x1F;
             break;
@@ -131,12 +144,14 @@ ssize_t razer_accessory_attr_write_mode_none(IOUSBDeviceInterface **usb_dev, con
         case USB_DEVICE_ID_RAZER_CHROMA_BASE:
         case USB_DEVICE_ID_RAZER_NOMMO_PRO:
         case USB_DEVICE_ID_RAZER_NOMMO_CHROMA:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
             report = razer_chroma_extended_matrix_effect_none(VARSTORE, ZERO_LED);
             report.transaction_id.id = 0x3F;
             break;
 
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             report = razer_chroma_extended_matrix_effect_none(VARSTORE, ZERO_LED);
             report.transaction_id.id = 0x1F;
             break;
@@ -198,11 +213,13 @@ ssize_t razer_accessory_attr_write_mode_custom(IOUSBDeviceInterface **usb_dev, c
         case USB_DEVICE_ID_RAZER_CHROMA_BASE:
         case USB_DEVICE_ID_RAZER_NOMMO_PRO:
         case USB_DEVICE_ID_RAZER_NOMMO_CHROMA:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
             report = razer_chroma_extended_matrix_effect_custom_frame();
             break;
 
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             report = razer_chroma_extended_matrix_effect_custom_frame();
             report.transaction_id.id = 0x1F;
             break;
@@ -239,12 +256,14 @@ ssize_t razer_accessory_attr_write_mode_static(IOUSBDeviceInterface **usb_dev, c
             case USB_DEVICE_ID_RAZER_CHROMA_BASE:
             case USB_DEVICE_ID_RAZER_NOMMO_PRO:
             case USB_DEVICE_ID_RAZER_NOMMO_CHROMA:
+            case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
                 report = razer_chroma_extended_matrix_effect_static(VARSTORE, ZERO_LED, (struct razer_rgb*) & buf[0]);
                 report.transaction_id.id = 0x3F;
                 break;
 
             case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
             case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+            case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
                 report = razer_chroma_extended_matrix_effect_static(VARSTORE, ZERO_LED, (struct razer_rgb*) & buf[0]);
                 report.transaction_id.id = 0x1F;
                 break;
@@ -286,12 +305,20 @@ ssize_t razer_accessory_attr_write_mode_wave(IOUSBDeviceInterface **usb_dev, con
         case USB_DEVICE_ID_RAZER_CHROMA_BASE:
         case USB_DEVICE_ID_RAZER_NOMMO_PRO:
         case USB_DEVICE_ID_RAZER_NOMMO_CHROMA:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
             report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, speed);
             report.transaction_id.id = 0x3F;
             break;
 
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+            report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, speed);
+            report.transaction_id.id = 0x1F;
+            break;
+        /* Fall through */
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
+            // Direction values are flipped compared to other devices
+            direction ^= ((1<<0) | (1<<1));
             report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, speed);
             report.transaction_id.id = 0x1F;
             break;
@@ -322,6 +349,7 @@ ssize_t razer_accessory_attr_write_mode_breath(IOUSBDeviceInterface **usb_dev, c
         case USB_DEVICE_ID_RAZER_CHROMA_BASE:
         case USB_DEVICE_ID_RAZER_NOMMO_PRO:
         case USB_DEVICE_ID_RAZER_NOMMO_CHROMA:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
             switch(count) {
                 case 3: // Single colour mode
                     report = razer_chroma_extended_matrix_effect_breathing_single(VARSTORE, ZERO_LED, (struct razer_rgb *)&buf[0]);
@@ -342,6 +370,7 @@ ssize_t razer_accessory_attr_write_mode_breath(IOUSBDeviceInterface **usb_dev, c
 
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             switch(count) {
                 case 3: // Single colour mode
                     report = razer_chroma_extended_matrix_effect_breathing_single(VARSTORE, ZERO_LED, (struct razer_rgb *)&buf[0]);
@@ -407,6 +436,7 @@ ssize_t razer_accessory_attr_write_device_mode(IOUSBDeviceInterface **usb_dev, c
         switch(product) {
             case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
             case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+            case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
                 report.transaction_id.id = 0x1F;
                 break;
         }
@@ -442,6 +472,7 @@ ssize_t razer_accessory_attr_read_device_mode(IOUSBDeviceInterface **usb_dev, ch
     switch(product) {
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             report.transaction_id.id = 0x1F;
             break;
     }
@@ -465,6 +496,7 @@ ssize_t razer_accessory_attr_write_set_brightness(IOUSBDeviceInterface **usb_dev
     switch (product) {
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, ZERO_LED, brightness);
             report.transaction_id.id = 0x1F;
             break;
@@ -477,6 +509,7 @@ ssize_t razer_accessory_attr_write_set_brightness(IOUSBDeviceInterface **usb_dev
         case USB_DEVICE_ID_RAZER_CHROMA_BASE:
         case USB_DEVICE_ID_RAZER_NOMMO_PRO:
         case USB_DEVICE_ID_RAZER_NOMMO_CHROMA:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:  // In openrazer this is bundled with saving brightness to usb_dev for MOUSE_DOCK
             report = razer_chroma_extended_matrix_brightness(VARSTORE, ZERO_LED, brightness);
             break;
 
@@ -506,6 +539,8 @@ ushort razer_accessory_attr_read_set_brightness(IOUSBDeviceInterface **usb_dev)
     switch (product) {
         case USB_DEVICE_ID_RAZER_MOUSE_BUNGEE_V3_CHROMA:
         case USB_DEVICE_ID_RAZER_BASE_STATION_V2_CHROMA:
+        case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
             break;
 
         default:
