@@ -1693,12 +1693,12 @@ ssize_t razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf)
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS:
         case USB_DEVICE_ID_RAZER_MAMBA_WIRELESS_RECEIVER:
         case USB_DEVICE_ID_RAZER_MAMBA_WIRELESS_WIRED:
-        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE:
-        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE_RECEIVER:
         case USB_DEVICE_ID_RAZER_DEATHADDER_V2_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_DEATHADDER_V2_PRO_WIRELESS:
             report.transaction_id.id = 0x3f;
             break;
+        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE_RECEIVER:
+        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE:
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_RECEIVER:
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_WIRED:
             report.transaction_id.id = 0x1f;
@@ -1725,12 +1725,12 @@ ssize_t razer_attr_read_is_charging(IOUSBDeviceInterface **usb_dev, char *buf)
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS:
         case USB_DEVICE_ID_RAZER_MAMBA_WIRELESS_RECEIVER:
         case USB_DEVICE_ID_RAZER_MAMBA_WIRELESS_WIRED:
-        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE:
-        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE_RECEIVER:
         case USB_DEVICE_ID_RAZER_DEATHADDER_V2_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_DEATHADDER_V2_PRO_WIRELESS:
             report.transaction_id.id = 0x3f;
             break;
+        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE_RECEIVER:
+        case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE:
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_RECEIVER:
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_WIRED:
             report.transaction_id.id = 0x1f;
