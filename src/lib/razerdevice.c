@@ -239,7 +239,7 @@ IOUSBDeviceInterface **getRazerUSBDeviceInterface(int type)
 
 	io_iterator_t iter;
 	kern_return_t kReturn =
-		IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDict, &iter);
+		IOServiceGetMatchingServices(MACH_PORT_NULL, matchingDict, &iter);
 	if (kReturn != kIOReturnSuccess)
 	{
 		return NULL;
@@ -385,7 +385,7 @@ RazerDevices getAllRazerDevices()
 
     io_iterator_t iter;
     kern_return_t kReturn =
-            IOServiceGetMatchingServices(kIOMasterPortDefault, matchingDict, &iter);
+            IOServiceGetMatchingServices(MACH_PORT_NULL, matchingDict, &iter);
     if (kReturn != kIOReturnSuccess)
     {
         return allDevices;
