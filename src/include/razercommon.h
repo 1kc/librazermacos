@@ -25,6 +25,10 @@
 #define OFF 0x00
 #define ON  0x01
 
+// LED STORAGE Options
+#define NOSTORE          0x00
+#define VARSTORE         0x01
+
 // LED definitions
 #define ZERO_LED             0x00
 #define SCROLL_WHEEL_LED     0x01
@@ -40,16 +44,11 @@
 #define RIGHT_SIDE_LED       0x10
 #define LEFT_SIDE_LED        0x11
 
-// LED STORAGE Options
-#define NOSTORE          0x00
-#define VARSTORE         0x01
-
 // LED Effect definitions
 #define LED_STATIC           0x00
 #define LED_BLINKING         0x01
 #define LED_PULSATING        0x02
 #define LED_SPECTRUM_CYCLING 0x04
-
 
 // Report Responses
 #define RAZER_CMD_BUSY          0x01
