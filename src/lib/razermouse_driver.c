@@ -64,6 +64,10 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
         return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_NEW_MOUSE_RECEIVER_WAIT_MIN_US);
         break;
 
+    case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
+        return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_ATHERIS_RECEIVER_WAIT_MIN_US);
+        break;
+
     case USB_DEVICE_ID_RAZER_VIPER_ULTIMATE_WIRELESS:
     case USB_DEVICE_ID_RAZER_VIPER_ULTIMATE_WIRED:
     case USB_DEVICE_ID_RAZER_NAGA_TRINITY:
@@ -1699,6 +1703,7 @@ ssize_t razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf)
             break;
         case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE_RECEIVER:
         case USB_DEVICE_ID_RAZER_BASILISK_ULTIMATE:
+        case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_RECEIVER:
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_WIRED:
             report.transaction_id.id = 0x1f;
@@ -1721,6 +1726,12 @@ ssize_t razer_attr_read_is_charging(IOUSBDeviceInterface **usb_dev, char *buf)
     (*usb_dev)->GetDeviceProduct(usb_dev, &product);
 
     switch(product) {
+    // Wireless mice that don't support is_charging
+    // Use AA batteries
+        case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
+            return sprintf(buf, "0\n");
+            break;
+            
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRED:
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS:
         case USB_DEVICE_ID_RAZER_MAMBA_WIRELESS_RECEIVER:

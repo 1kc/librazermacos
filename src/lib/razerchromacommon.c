@@ -552,6 +552,8 @@ struct razer_report razer_chroma_extended_matrix_effect_wave(unsigned char varia
     // Others use values 0x01, 0x02
     direction = clamp_u8(direction, 0x00, 0x02);
 
+    // Razer has also added a "Fast Wave" effect for at least one device
+    // which uses the same effect command but a speed parameter of 0x10
     report.arguments[3] = direction;
     report.arguments[4] = speed; // Speed, lower values are faster (). The default used to be 0x28
     return report;
@@ -1070,8 +1072,8 @@ struct razer_report razer_chroma_misc_set_dpi_xy(unsigned char variable_storage,
     struct razer_report report = get_razer_report(0x04, 0x05, 0x07);
 
     // Keep the DPI within bounds
-    dpi_x = clamp_u16(dpi_x, 128, 20000);
-    dpi_y = clamp_u16(dpi_y, 128, 20000);
+    dpi_x = clamp_u16(dpi_x, 100, 26000);
+    dpi_y = clamp_u16(dpi_y, 100, 26000);
 
     report.arguments[0] = VARSTORE;
 
