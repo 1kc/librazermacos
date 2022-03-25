@@ -53,6 +53,7 @@ bool is_blade_laptop(IOUSBDeviceInterface **usb_dev)
     case USB_DEVICE_ID_RAZER_BLADE_PRO_2017_FULLHD:
     case USB_DEVICE_ID_RAZER_BLADE_2019_BASE:
     case USB_DEVICE_ID_RAZER_BLADE_STEALTH_LATE_2019:
+    case USB_DEVICE_ID_RAZER_BLADE_EARLY_2021_BASE:
         return true;
     }
 
@@ -567,6 +568,7 @@ ssize_t razer_attr_write_mode_static(IOUSBDeviceInterface **usb_dev, const char 
     case USB_DEVICE_ID_RAZER_TARTARUS:
     case USB_DEVICE_ID_RAZER_TARTARUS_CHROMA:
     case USB_DEVICE_ID_RAZER_ORBWEAVER_CHROMA:
+    case USB_DEVICE_ID_RAZER_BLADE_EARLY_2021_BASE:
         if (count == 3)
         {
             report = razer_chroma_standard_matrix_effect_static(VARSTORE, BACKLIGHT_LED, (struct razer_rgb *)&buf[0]);
@@ -723,6 +725,7 @@ ssize_t razer_attr_write_mode_static_no_store(IOUSBDeviceInterface **usb_dev, co
     case USB_DEVICE_ID_RAZER_TARTARUS:
     case USB_DEVICE_ID_RAZER_TARTARUS_CHROMA:
     case USB_DEVICE_ID_RAZER_ORBWEAVER_CHROMA:
+    case USB_DEVICE_ID_RAZER_BLADE_EARLY_2021_BASE:
         if (count == 3)
         {
             report = razer_chroma_standard_matrix_effect_static(NOSTORE, BACKLIGHT_LED, (struct razer_rgb *)&buf[0]);
