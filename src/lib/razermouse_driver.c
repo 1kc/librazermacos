@@ -1947,6 +1947,7 @@ void razer_attr_write_matrix_brightness(IOUSBDeviceInterface **usb_dev, unsigned
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, 0x00, brightness);
             report.transaction_id.id = 0x1F;
             break;
@@ -1998,6 +1999,7 @@ ushort razer_attr_read_matrix_brightness(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3:
             report = razer_chroma_extended_matrix_get_brightness(VARSTORE, 0x00);
             report.transaction_id.id = 0x1F;
             break;
