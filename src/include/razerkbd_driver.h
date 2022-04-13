@@ -73,10 +73,12 @@
 #define USB_DEVICE_ID_RAZER_CYNOSA_LITE 0x023F
 #define USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_TK 0x0a24
 #define USB_DEVICE_ID_RAZER_HUNTSMAN_MINI 0x0257
+#define USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRED 0x0258
 #define USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRED 0x025A
 #define USB_DEVICE_ID_RAZER_HUNTSMAN_V2_ANALOG 0x0266
 #define USB_DEVICE_ID_RAZER_HUNTSMAN_V2 0x026c
 #define USB_DEVICE_ID_RAZER_HUNTSMAN_V2_TKL 0x026b
+#define USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS 0x0271
 
 /* Each keyboard report has 90 bytes*/
 #define RAZER_BLACKWIDOW_REPORT_LEN 0x5A
@@ -119,6 +121,9 @@
 #define RAZER_BLACKWIDOW_CHROMA_WAIT_MIN_US 600
 #define RAZER_BLACKWIDOW_CHROMA_WAIT_MAX_US 800
 
+#define RAZER_BLACKWIDOW_V3_WIRELESS_WAIT_MIN_US 4900
+#define RAZER_BLACKWIDOW_V3_WIRELESS_WAIT_MAX_US 5000
+
 #define RAZER_FIREFLY_WAIT_MIN_US 900
 #define RAZER_FIREFLY_WAIT_MAX_US 1000
 
@@ -138,6 +143,8 @@ bool is_blade_laptop(IOUSBDeviceInterface **usb_dev);
 ssize_t razer_attr_read_mode_game(IOUSBDeviceInterface **usb_dev, char *buf);
 ssize_t razer_attr_write_mode_macro(IOUSBDeviceInterface **usb_dev, const char *buf, int count);
 ssize_t razer_attr_write_mode_macro_effect(IOUSBDeviceInterface **usb_dev, const char *buf, int count);
+ssize_t razer_attr_read_mode_get_battery(IOUSBDeviceInterface **usb_dev, char *buf);
+ssize_t razer_attr_read_mode_is_charging(IOUSBDeviceInterface **usb_dev, char *buf);
 ssize_t razer_attr_read_mode_macro_effect(IOUSBDeviceInterface **usb_dev, char *buf);
 ssize_t razer_attr_write_mode_pulsate(IOUSBDeviceInterface **usb_dev, const char *buf, int count);
 ssize_t razer_attr_read_mode_pulsate(IOUSBDeviceInterface **usb_dev, char *buf);
