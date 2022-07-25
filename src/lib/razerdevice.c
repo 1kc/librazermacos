@@ -15,6 +15,9 @@ bool is_razer_device(IOUSBDeviceInterface **dev)
 	return vendor == USB_VENDOR_ID_RAZER;
 }
 
+/**
+ * @brief Checks if the given USB Device is a Keyboard, by checking the product ID.
+ */
 bool is_keyboard(IOUSBDeviceInterface **usb_dev)
 {
 	UInt16 product = -1;
@@ -60,6 +63,7 @@ bool is_keyboard(IOUSBDeviceInterface **usb_dev)
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3:
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_TK:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRED:
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
 	case USB_DEVICE_ID_RAZER_HUNTSMAN_MINI:
     case USB_DEVICE_ID_RAZER_HUNTSMAN_V2_ANALOG:
     case USB_DEVICE_ID_RAZER_HUNTSMAN_V2:

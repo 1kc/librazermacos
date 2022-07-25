@@ -15,7 +15,13 @@ int main(int argc, const char * argv[]) {
         // Testing out the blackwidow v3 pro changes by switching to wave
         if (device.productId == 0x025A)
         {
-            printf("Found blackwidow v3 pro keyboard (wired)\n");
+            printf("Found BlackWidow V3 PRO Keyboard (wired)\n");
+            razer_attr_write_mode_wave(device.usbDevice, "1", 0, 0x90);
+        }
+        // Testing out the blackwidow v3 pro changes by switching to wave
+        if (device.productId == 0x025C)
+        {
+            printf("Found BlackWidow V3 PRO Keyboard (wireless)\n");
             razer_attr_write_mode_wave(device.usbDevice, "1", 0, 0x90);
         }
     }

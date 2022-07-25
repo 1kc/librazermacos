@@ -33,12 +33,22 @@
 #define USB_VENDOR_ID_RAZER 0x1532
 #endif
 
+/**
+ * @brief Represents a single Razer Device, connected over a USB Port. 
+ * It might be a real USB cable or a wireless USB Adapter.
+ * @param productId The identifier of this device, to see if it is connected.
+ * @param internalDeviceId Represents the Internal ID of this device. 
+ * 
+ */
 typedef struct {
     IOUSBDeviceInterface **usbDevice;
     UInt16 productId;
     int internalDeviceId;
 } RazerDevice;
 
+/**
+ * @brief Represents a list of Razer Devices.
+ */
 typedef struct {
     RazerDevice *devices;
     int size;
