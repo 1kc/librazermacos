@@ -24,10 +24,9 @@ int main(int argc, const char *argv[])
             razer_attr_write_mode_wave(device.usbDevice, "0", 0, 0x90);
             break;
         case 0x025C:
-
             // Testing out the blackwidow v3 pro changes by switching to wave
             printf("Found BlackWidow V3 PRO Keyboard (Wireless)\n");
-            razer_attr_write_mode_wave(device.usbDevice, "1", 0, 0x90);
+            razer_attr_write_mode_wave(device.usbDevice, "0", 0, 0x90);
             break;
         default:
             break;

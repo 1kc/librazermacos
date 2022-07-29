@@ -201,6 +201,7 @@ ssize_t razer_attr_read_mode_is_charging(IOUSBDeviceInterface **usb_dev, char *b
         report.transaction_id.id = 0x1F;
         break;
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
         report.transaction_id.id = 0x9F;
         break;
     }
@@ -1791,7 +1792,6 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
         response_index = 0x01;
         break;
     }
-
     return razer_get_usb_response(usb_dev, report_index, request_report, response_index, response_report, wait_us);
 }
 
@@ -1826,7 +1826,7 @@ static struct razer_report razer_send_payload(IOUSBDeviceInterface **dev, struct
         } else if (response_report.status == RAZER_CMD_TIMEOUT) {
             printf("Command timed out (keyboard)\n");
         } else {
-            printf("Command didn't work probably.\n");
+            printf("Command didn't work probably.");
         }
     } else {
         printf("Invalid Report Length (keyboard)\n");
