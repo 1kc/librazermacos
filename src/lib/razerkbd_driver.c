@@ -171,8 +171,8 @@ ssize_t razer_attr_read_mode_get_battery(IOUSBDeviceInterface **usb_dev, char *b
         report.transaction_id.id = 0x1F;
         break;
 
-    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
         report.transaction_id.id = 0x9F;
         break;
     }
