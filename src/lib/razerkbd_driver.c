@@ -361,8 +361,8 @@ ssize_t razer_attr_write_mode_none(IOUSBDeviceInterface **usb_dev, const char *b
         report.transaction_id.id = 0x1F;
         break;
     
-    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
         report = razer_chroma_extended_matrix_effect_none(VARSTORE, BACKLIGHT_LED);
         report.transaction_id.id = 0x9F;
         break;
@@ -1757,7 +1757,9 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
 
     uint report_index;
     uint response_index;
-    uint waitTime = RAZER_BLACKWIDOW_CHROMA_WAIT_MIN_US;
+
+    int wait_us = RAZER_BLACKWIDOW_CHROMA_WAIT_MIN_US;
+
     switch (product)
     {
     case USB_DEVICE_ID_RAZER_ANANSI:
@@ -1782,7 +1784,7 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:
         report_index = 0x03;
         response_index = 0x03;
-        waitTime = RAZER_BLACKWIDOW_V3_WIRELESS_WAIT_MIN_US;
+        wait_us = RAZER_BLACKWIDOW_V3_WIRELESS_WAIT_MIN_US;
         break;
     default:
         report_index = 0x01;
@@ -1790,7 +1792,7 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
         break;
     }
 
-    return razer_get_usb_response(usb_dev, report_index, request_report, response_index, response_report, waitTime);
+    return razer_get_usb_response(usb_dev, report_index, request_report, response_index, response_report, wait_us);
 }
 
 /**
