@@ -1780,8 +1780,8 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
         response_index = 0x03;
         break;
 
-    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRELESS:
         report_index = 0x03;
         response_index = 0x03;
         wait_us = RAZER_BLACKWIDOW_V3_WIRELESS_WAIT_MIN_US;
@@ -1814,15 +1814,18 @@ static struct razer_report razer_send_payload(IOUSBDeviceInterface **dev, struct
             response_report.command_id.id != request_report->command_id.id)
         {
             printf("Response doesnt match request (keyboard)\n");
+        }
+        else if (response_report.status == RAZER_CMD_SUCCESSFUL) {
+            printf("Command was successful.\n");
         } else if (response_report.status == RAZER_CMD_BUSY) {
-            //printf("Device is busy (keyboard)\n");
+            printf("Device is busy (keyboard)\n");
         } else if (response_report.status == RAZER_CMD_FAILURE) {
             printf("Command failed (keyboard)\n");
         } else if (response_report.status == RAZER_CMD_NOT_SUPPORTED) {
             printf("Command not supported (keyboard)\n");
         } else if (response_report.status == RAZER_CMD_TIMEOUT) {
             printf("Command timed out (keyboard)\n");
-        }else {
+        } else {
             printf("Command didn't work probably.\n");
         }
     } else {
