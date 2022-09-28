@@ -949,7 +949,7 @@ ssize_t razer_attr_write_mode_starlight(IOUSBDeviceInterface **usb_dev, const ch
 
     switch (product)
     {
-    case USB_DEVICE_ID_RAZER_ORNATA:    
+    case USB_DEVICE_ID_RAZER_ORNATA:
         if (count == 4)
         {
             report = razer_chroma_extended_matrix_effect_starlight_single(VARSTORE, BACKLIGHT_LED, buf[0], (struct razer_rgb *)&buf[1]);
@@ -971,7 +971,7 @@ ssize_t razer_attr_write_mode_starlight(IOUSBDeviceInterface **usb_dev, const ch
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_TK:
     case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_PRO_WIRED:
-    case USB_DEVICE_ID_RAZER_HUNTSMAN_MINI:        
+    case USB_DEVICE_ID_RAZER_HUNTSMAN_MINI:
         if (count == 7)
         {
             report = razer_chroma_extended_matrix_effect_starlight_dual(VARSTORE, BACKLIGHT_LED, buf[0], (struct razer_rgb *)&buf[1], (struct razer_rgb *)&buf[4]);
@@ -1022,7 +1022,7 @@ ssize_t razer_attr_write_mode_starlight(IOUSBDeviceInterface **usb_dev, const ch
         razer_send_payload(usb_dev, &report);
         break;
 
-    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:    
+    case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:
         if (count == 7)
         {
             report = razer_chroma_extended_matrix_effect_starlight_dual(VARSTORE, BACKLIGHT_LED, buf[0], (struct razer_rgb *)&buf[1], (struct razer_rgb *)&buf[4]);
@@ -1044,7 +1044,7 @@ ssize_t razer_attr_write_mode_starlight(IOUSBDeviceInterface **usb_dev, const ch
         razer_send_payload(usb_dev, &report);
         break;
 
-    case USB_DEVICE_ID_RAZER_TARTARUS_V2:    
+    case USB_DEVICE_ID_RAZER_TARTARUS_V2:
         if (count == 7)
         {
             report = razer_chroma_extended_matrix_effect_starlight_dual(VARSTORE, BACKLIGHT_LED, buf[0], (struct razer_rgb *)&buf[1], (struct razer_rgb *)&buf[4]);
