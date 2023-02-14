@@ -84,6 +84,7 @@ bool is_mouse(IOUSBDeviceInterface **usb_dev)
 	case USB_DEVICE_ID_RAZER_ABYSSUS_1800:
 	case USB_DEVICE_ID_RAZER_MAMBA_2012_WIRED:
 	case USB_DEVICE_ID_RAZER_MAMBA_2012_WIRELESS:
+	case USB_DEVICE_ID_RAZER_SWTOR_MOUSE_V2:
 	case USB_DEVICE_ID_RAZER_NAGA_2012:
 	case USB_DEVICE_ID_RAZER_IMPERATOR:
 	case USB_DEVICE_ID_RAZER_OUROBOROS:
@@ -155,6 +156,7 @@ bool is_mouse_dock(IOUSBDeviceInterface **usb_dev)
 
 	switch (product)
 	{
+	case USB_DEVICE_ID_RAZER_SWTOR_MOUSE_CHARGING_DOCK:
 	case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
 		return true;
 	}
@@ -202,6 +204,7 @@ bool is_headphone(IOUSBDeviceInterface **usb_dev)
 
     switch (product) 
     {
+	case USB_DEVICE_ID_RAZER_SWTOR_HEADSET:
         case USB_DEVICE_ID_RAZER_KRAKEN_KITTY_EDITION:
         case USB_DEVICE_ID_RAZER_KRAKEN_V2:
         case USB_DEVICE_ID_RAZER_KRAKEN_ULTIMATE:
