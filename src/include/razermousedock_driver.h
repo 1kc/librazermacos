@@ -8,7 +8,7 @@
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
  */
- 
+
 #include <IOKit/IOKitLib.h>
 #include <IOKit/usb/IOUSBLib.h>
 
@@ -16,6 +16,7 @@
 #define __HID_RAZER_MOUSE_DOCK_H
 
 #define USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK 0x007E
+#define USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO 0x00A4
 
 /* Each report has 90 bytes*/
 #define RAZER_REPORT_LEN 0x5A
@@ -23,6 +24,8 @@
 #define RAZER_MOUSE_DOCK_WAIT_MIN_US 600
 #define RAZER_MOUSE_DOCK_WAIT_MAX_US 800
 
+#define RAZER_MOUSE_DOCK_PRO_WAIT_MIN_US 59900
+#define RAZER_MOUSE_DOCK_PRO_WAIT_MAX_US 60000
 
 ssize_t razer_mouse_dock_attr_write_mode_static(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);
 ssize_t razer_mouse_dock_attr_write_mode_static_no_store(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);

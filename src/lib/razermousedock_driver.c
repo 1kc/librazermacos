@@ -36,6 +36,10 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
     switch (product) {
     // These devices require longer waits to read their firmware, serial, and other setting values
     case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
+        return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_MOUSE_DOCK_PRO_WAIT_MIN_US);
+        break;
+
+    case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
         return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_MOUSE_DOCK_WAIT_MIN_US);
         break;
 
@@ -94,6 +98,7 @@ ssize_t razer_mouse_dock_attr_write_mode_static(IOUSBDeviceInterface **usb_dev, 
     if(count == 3) {
         switch (product) {
         case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
             report = razer_chroma_extended_matrix_effect_static(VARSTORE, ZERO_LED, (struct razer_rgb*) & buf[0]);
             break;
 
@@ -131,6 +136,7 @@ ssize_t razer_mouse_dock_attr_write_mode_static_no_store(IOUSBDeviceInterface **
     if(count == 3) {
         switch (product) {
         case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
             report = razer_chroma_extended_matrix_effect_static(NOSTORE, ZERO_LED, (struct razer_rgb*) & buf[0]);
             break;
 
@@ -142,7 +148,7 @@ ssize_t razer_mouse_dock_attr_write_mode_static_no_store(IOUSBDeviceInterface **
         report.transaction_id.id = 0x3F;
 
         razer_send_payload(usb_dev, &report);
-        
+
     } else {
         printf("razerdock: Static mode only accepts RGB (3byte)\n");
     }
@@ -150,6 +156,22 @@ ssize_t razer_mouse_dock_attr_write_mode_static_no_store(IOUSBDeviceInterface **
     return count;
 }
 
+ssize_t razer_dock_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf)
+{
+    struct razer_report report = razer_chroma_misc_get_battery_level();
+    struct razer_report response_report = {0};
+    UInt16 product = -1;
+    (*usb_dev)->GetDeviceProduct(usb_dev, &product);
+
+    switch (product)
+    {
+    case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+        report.transaction_id.id = 0x1f;
+        break;
+    }
+    response_report = razer_send_payload(usb_dev, &report);
+    return sprintf(buf, "%d\n", response_report.arguments[1]);
+}
 
 /**
  * Write device file "logo_mode_spectrum" (for extended mouse matrix effects)
@@ -165,6 +187,7 @@ ssize_t razer_mouse_dock_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev
 
     switch(product) {
     case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
+    case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
         report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, ZERO_LED);
         break;
 
@@ -192,6 +215,7 @@ ssize_t razer_mouse_dock_attr_write_mode_breath(IOUSBDeviceInterface **usb_dev, 
 
     switch(product) {
     case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
+    case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
         switch(count) {
         case 3: // Single colour mode
             report = razer_chroma_extended_matrix_effect_breathing_single(VARSTORE, ZERO_LED, (struct razer_rgb*)&buf[0]);
@@ -229,6 +253,7 @@ ssize_t razer_mouse_dock_attr_write_mode_none(IOUSBDeviceInterface **usb_dev, co
 
     switch(product) {
     case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
+    case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
         report = razer_chroma_extended_matrix_effect_none(VARSTORE, ZERO_LED);
         break;
 
