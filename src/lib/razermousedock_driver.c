@@ -36,11 +36,11 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
     switch (product) {
     // These devices require longer waits to read their firmware, serial, and other setting values
     case USB_DEVICE_ID_RAZER_MOUSE_CHARGING_DOCK:
-        return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_MOUSE_DOCK_PRO_WAIT_MIN_US);
+        return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_MOUSE_DOCK_WAIT_MIN_US);
         break;
 
     case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
-        return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_MOUSE_DOCK_WAIT_MIN_US);
+        return razer_get_usb_response(usb_dev, 0x00, request_report, 0x00, response_report, RAZER_MOUSE_DOCK_PRO_WAIT_MIN_US);
         break;
 
     default:
@@ -196,6 +196,11 @@ ssize_t razer_mouse_dock_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev
         return count;
     }
 
+    switch (product) {
+    case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+        report.transaction_id.id = 0x1f;
+        break;
+    }
     razer_send_payload(usb_dev, &report);
     return count;
 }
@@ -232,7 +237,13 @@ ssize_t razer_mouse_dock_attr_write_mode_breath(IOUSBDeviceInterface **usb_dev, 
         break;
     }
 
-    report.transaction_id.id = 0x3f;
+    switch(product) {
+    case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+        report.transaction_id.id = 0x1f;
+
+    default:
+        report.transaction_id.id = 0x3f;
+    }
 
     razer_send_payload(usb_dev, &report);
     return count;
@@ -240,7 +251,7 @@ ssize_t razer_mouse_dock_attr_write_mode_breath(IOUSBDeviceInterface **usb_dev, 
 
 
 /**
- * Write device file "logo_mode_none" (for extended mouse matrix effects)
+ * Write device file "mode_none" (for extended mouse matrix effects)
  *
  * No effect is activated whenever this file is written to
  */
