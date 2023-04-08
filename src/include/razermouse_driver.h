@@ -8,7 +8,7 @@
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
  */
- 
+
 #include <IOKit/IOKitLib.h>
 #include <IOKit/usb/IOUSBLib.h>
 
@@ -79,6 +79,9 @@
 #define USB_DEVICE_ID_RAZER_OROCHI_V2_RECEIVER 0x0094
 #define USB_DEVICE_ID_RAZER_OROCHI_V2 0x0095
 #define USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH 0x0095
+#define USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED 0x00AA
+#define USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRELESS 0x00AB
+#define USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO 0x00A4
 
 /* Each keyboard report has 90 bytes*/
 #define RAZER_REPORT_LEN 0x5A
