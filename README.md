@@ -24,4 +24,4 @@ make librazermacos.so
 ```
 
 ## razer-macos frontend
-[razer-macos](https://github.com/1kc/razer-macos/) does not actually build `librazermacos.so`, instead the drivers are built by [binding.gyp](https://github.com/1kc/razer-macos/blob/master/binding.gyp).
+[razer-macos](https://github.com/stickoking/librazermacos) does not actually build `librazermacos.so`, instead the drivers are built by [binding.gyp](https://github.com/1kc/razer-macos/blob/master/binding.gyp).
