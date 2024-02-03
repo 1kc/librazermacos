@@ -1,5 +1,8 @@
 # librazermacos
 
+### Important Note
+This is not the original repo the original repo is from [1kc/librazermacos](https://github.com/1kc/librazermacos) I forked this repo to maintain it as the original seems to be abandoned.
+
 C library of openrazer drivers ported to macOS.
 
 Exposed as a shared/dynamic library - `librazermacos.so` to provider interoperability with various frontends.
