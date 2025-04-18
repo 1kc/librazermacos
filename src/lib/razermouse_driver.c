@@ -1773,6 +1773,8 @@ ssize_t razer_attr_read_get_battery(IOUSBDeviceInterface **usb_dev, char *buf)
         case USB_DEVICE_ID_RAZER_LANCEHEAD_WIRELESS_WIRED:
         case USB_DEVICE_ID_RAZER_OROCHI_V2_RECEIVER:
         case USB_DEVICE_ID_RAZER_OROCHI_V2_BLUETOOTH:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRED:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRELESS:
             report.transaction_id.id = 0x1f;
             break;
     }
