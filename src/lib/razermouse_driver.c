@@ -80,6 +80,7 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
         return razer_get_usb_response(usb_dev, index, request_report, index, response_report, RAZER_VIPER_MOUSE_RECEIVER_WAIT_MIN_US);
         break;
             
+    case USB_DEVICE_ID_RAZER_NAGA_X:
     case USB_DEVICE_ID_RAZER_BASILISK_V3:
     case USB_DEVICE_ID_RAZER_BASILISK_V3_35K:
         index = 0x03;
@@ -360,6 +361,7 @@ ssize_t razer_attr_write_side_mode_spectrum(IOUSBDeviceInterface **usb_dev, cons
             break;
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
             report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, side);
             report.transaction_id.id = 0x1f;
@@ -429,6 +431,7 @@ ssize_t razer_attr_write_side_mode_breath(IOUSBDeviceInterface **usb_dev, const 
         case USB_DEVICE_ID_RAZER_VIPER_MINI:
         case USB_DEVICE_ID_RAZER_VIPER_ULTIMATE_WIRED:
         case USB_DEVICE_ID_RAZER_NAGA_TRINITY:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_DEATHADDER_V2_PRO_WIRELESS:
@@ -458,6 +461,7 @@ ssize_t razer_attr_write_side_mode_breath(IOUSBDeviceInterface **usb_dev, const 
     switch(product) {
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
             report.transaction_id.id = 0x1f;
             break;
 
@@ -501,6 +505,7 @@ ssize_t razer_attr_write_side_mode_none(IOUSBDeviceInterface **usb_dev, const ch
         case USB_DEVICE_ID_RAZER_VIPER_MINI:
         case USB_DEVICE_ID_RAZER_VIPER_ULTIMATE_WIRED:
         case USB_DEVICE_ID_RAZER_NAGA_TRINITY:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_DEATHADDER_V2_PRO_WIRELESS:
@@ -777,6 +782,7 @@ ssize_t razer_attr_write_scroll_mode_static(IOUSBDeviceInterface **usb_dev, cons
                 break;
 
             case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
+            case USB_DEVICE_ID_RAZER_NAGA_X:
             case USB_DEVICE_ID_RAZER_BASILISK_V2:
             case USB_DEVICE_ID_RAZER_BASILISK_V3:
             case USB_DEVICE_ID_RAZER_BASILISK_V3_35K:
@@ -1619,6 +1625,7 @@ ssize_t razer_attr_write_logo_mode_reactive(IOUSBDeviceInterface **usb_dev, cons
             break;
 
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
             report = razer_chroma_extended_matrix_effect_reactive(VARSTORE, LOGO_LED, speed, (struct razer_rgb*)&buf[1]);
             report.transaction_id.id = 0x1f;
@@ -1887,6 +1894,7 @@ ushort razer_attr_read_poll_rate(IOUSBDeviceInterface **usb_dev)
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
@@ -1985,6 +1993,7 @@ void razer_attr_write_poll_rate(IOUSBDeviceInterface **usb_dev, ushort polling_r
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_ATHERIS_RECEIVER:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
@@ -2032,6 +2041,7 @@ void razer_attr_write_matrix_brightness(IOUSBDeviceInterface **usb_dev, unsigned
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
@@ -2085,6 +2095,7 @@ ushort razer_attr_read_matrix_brightness(IOUSBDeviceInterface **usb_dev)
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRELESS:
         case USB_DEVICE_ID_RAZER_NAGA_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
@@ -2136,6 +2147,7 @@ ushort razer_attr_read_scroll_led_brightness(IOUSBDeviceInterface **usb_dev)
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
@@ -2193,6 +2205,7 @@ void razer_attr_write_scroll_led_brightness(IOUSBDeviceInterface **usb_dev, unsi
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
@@ -2247,6 +2260,7 @@ ushort razer_attr_read_logo_led_brightness(IOUSBDeviceInterface **usb_dev)
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
@@ -2314,6 +2328,7 @@ void razer_attr_write_logo_led_brightness(IOUSBDeviceInterface **usb_dev, unsign
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V2:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
@@ -2378,6 +2393,7 @@ ushort razer_attr_read_side_led_brightness(IOUSBDeviceInterface **usb_dev, int s
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
             report = razer_chroma_extended_matrix_get_brightness(VARSTORE, side);
             report.transaction_id.id = 0x1f;
@@ -2422,6 +2438,7 @@ void razer_attr_write_side_led_brightness(IOUSBDeviceInterface **usb_dev, unsign
             break;
 
         case USB_DEVICE_ID_RAZER_NAGA_LEFT_HANDED_2020:
+        case USB_DEVICE_ID_RAZER_NAGA_X:
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, side, brightness);
             report.transaction_id.id = 0x1f;
