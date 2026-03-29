@@ -81,6 +81,10 @@ static int razer_get_report(IOUSBDeviceInterface **usb_dev, struct razer_report 
         return razer_get_usb_response(usb_dev, index, request_report, index, response_report, RAZER_NEW_MOUSE_RECEIVER_WAIT_MIN_US);
         break;
             
+    case USB_DEVICE_ID_RAZER_COBRA:
+        return razer_get_usb_response(usb_dev, index, request_report, index, response_report, RAZER_VIPER_MOUSE_RECEIVER_WAIT_MIN_US);
+        break;
+
     default:
         return razer_get_usb_response(usb_dev, index, request_report, index, response_report, RAZER_MOUSE_WAIT_MIN_US);
     }

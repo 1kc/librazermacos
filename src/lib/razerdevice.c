@@ -22,6 +22,7 @@ bool is_keyboard(IOUSBDeviceInterface **usb_dev)
 
 	switch (product)
 	{
+	case USB_DEVICE_ID_RAZER_COBRA:
 	case USB_DEVICE_ID_RAZER_NOSTROMO:
 	case USB_DEVICE_ID_RAZER_ORBWEAVER:
 	case USB_DEVICE_ID_RAZER_ORBWEAVER_CHROMA:
