@@ -89,6 +89,7 @@ ssize_t razer_mouse_mat_attr_write_mode_none(IOUSBDeviceInterface **usb_dev, con
     case USB_DEVICE_ID_RAZER_FIREFLY_V2:
     case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA:
     case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA_EXTENDED:
+    case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
         report = razer_chroma_extended_matrix_effect_none(VARSTORE, ZERO_LED);
         break;
 
@@ -119,6 +120,7 @@ ssize_t razer_mouse_mat_attr_write_mode_wave(IOUSBDeviceInterface **usb_dev, con
     switch(product) {
     case USB_DEVICE_ID_RAZER_FIREFLY_V2:
     case USB_DEVICE_ID_RAZER_FIREFLY_HYPERFLUX:
+    case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
         report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, 0x28);
         break;
 
@@ -146,6 +148,7 @@ ssize_t razer_mouse_mat_attr_write_mode_breath(IOUSBDeviceInterface **usb_dev, c
     case USB_DEVICE_ID_RAZER_FIREFLY_HYPERFLUX:
     case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA:
     case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA_EXTENDED:
+    case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
         switch(count) {
         case 3: // Single colour mode
             report = razer_chroma_extended_matrix_effect_breathing_single(VARSTORE, ZERO_LED, (struct razer_rgb *)&buf[0]);
@@ -201,6 +204,7 @@ ssize_t razer_mouse_mat_attr_write_mode_static(IOUSBDeviceInterface **usb_dev, c
         case USB_DEVICE_ID_RAZER_FIREFLY_HYPERFLUX:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA_EXTENDED:
+        case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
             report = razer_chroma_extended_matrix_effect_static(VARSTORE, ZERO_LED, (struct razer_rgb *)&buf[0]);
             break;
 
@@ -237,6 +241,7 @@ ssize_t razer_mouse_mat_attr_write_mode_static_no_store(IOUSBDeviceInterface **u
         case USB_DEVICE_ID_RAZER_FIREFLY_HYPERFLUX:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA_EXTENDED:
+        case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
             report = razer_chroma_extended_matrix_effect_static(NOSTORE, ZERO_LED, (struct razer_rgb *)&buf[0]);
             break;
 
@@ -264,6 +269,7 @@ ssize_t razer_mouse_mat_attr_write_set_brightness(IOUSBDeviceInterface **usb_dev
         case USB_DEVICE_ID_RAZER_FIREFLY_V2:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA_EXTENDED:
+        case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, ZERO_LED, brightness);
             break;
 
@@ -291,6 +297,7 @@ ushort razer_mouse_mat_attr_read_set_brightness(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_FIREFLY_V2:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA:
         case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA_EXTENDED:
+        case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
             brightness = 0xff; // Unfortunately, we can't read the brightness from the device directly. return dummy value.
             break;
 
@@ -320,6 +327,7 @@ ssize_t razer_mouse_mat_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev,
     case USB_DEVICE_ID_RAZER_FIREFLY_HYPERFLUX:
     case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA:
     case USB_DEVICE_ID_RAZER_GOLIATHUS_CHROMA_EXTENDED:
+    case USB_DEVICE_ID_RAZER_STRIDER_CHROMA:
         report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, ZERO_LED);
         break;
 
