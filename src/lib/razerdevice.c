@@ -39,6 +39,7 @@ bool is_keyboard(IOUSBDeviceInterface **usb_dev)
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_CHROMA:
 	case USB_DEVICE_ID_RAZER_DEATHSTALKER_EXPERT:
 	case USB_DEVICE_ID_RAZER_DEATHSTALKER_CHROMA:
+	case USB_DEVICE_ID_RAZER_DEATHSTALKER_V2:
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_CHROMA_TE:
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_X_CHROMA:
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_X_CHROMA_TE:
@@ -67,6 +68,10 @@ bool is_keyboard(IOUSBDeviceInterface **usb_dev)
     case USB_DEVICE_ID_RAZER_HUNTSMAN_V2_TKL:
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRED:
 	case USB_DEVICE_ID_RAZER_BLACKWIDOW_V3_MINI_WIRELESS:
+	case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_75:
+	case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_PRO:
+	case USB_DEVICE_ID_RAZER_BLACKWIDOW_V4_X:
+  case USB_DEVICE_ID_RAZER_ORNATA_V3X:
 		return true;
 	}
 
@@ -360,7 +365,7 @@ IOUSBDeviceInterface **getRazerUSBDeviceInterface(int type)
 			    continue;
 		}
 
-		kReturn = (*dev)->USBDeviceOpen(dev);
+		kReturn = (*dev)->USBDeviceOpenSeize(dev);
 		if (kReturn != kIOReturnSuccess)
 		{
 			printf("Unable to open USB device: %08x\n", kReturn);
@@ -455,7 +460,7 @@ RazerDevices getAllRazerDevices()
             continue;
         }
 
-        kReturn = (*dev)->USBDeviceOpen(dev);
+        kReturn = (*dev)->USBDeviceOpenSeize(dev);
         if (kReturn != kIOReturnSuccess)
         {
             printf("Unable to open USB device: %08x\n", kReturn);

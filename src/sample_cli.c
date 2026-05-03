@@ -18,6 +18,13 @@ int main(int argc, const char * argv[]) {
             printf("Found blackwidow v3 pro keyboard (wired)\n");
             razer_attr_write_mode_wave(device.usbDevice, "1", 0, 0x90);
         }
+
+        // BlackWidow V4 X
+        if (device.productId == 0x0293)
+        {
+            printf("Found BlackWidow V4 X keyboard\n");
+            razer_attr_write_mode_wave(device.usbDevice, "1", 0, 0x90);
+        }
     }
 
     closeAllRazerDevices(allDevices);
