@@ -197,6 +197,13 @@ void razer_attr_write_poll_rate(IOUSBDeviceInterface **usb_dev, ushort polling_r
 ushort razer_attr_read_matrix_brightness(IOUSBDeviceInterface **usb_dev);
 void razer_attr_write_matrix_brightness(IOUSBDeviceInterface **usb_dev, unsigned char brightness);
 
+ssize_t razer_attr_write_matrix_mode_none(IOUSBDeviceInterface **usb_dev);
+ssize_t razer_attr_write_matrix_mode_spectrum(IOUSBDeviceInterface **usb_dev);
+ssize_t razer_attr_write_matrix_mode_wave(IOUSBDeviceInterface **usb_dev, unsigned char direction);
+ssize_t razer_attr_write_matrix_mode_static(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count, unsigned char storage);
+ssize_t razer_attr_write_matrix_mode_reactive(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);
+ssize_t razer_attr_write_matrix_mode_breath(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count);
+
 ushort razer_attr_read_scroll_led_brightness(IOUSBDeviceInterface **usb_dev);
 void razer_attr_write_scroll_led_brightness(IOUSBDeviceInterface **usb_dev, unsigned char brightness);
 

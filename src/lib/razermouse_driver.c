@@ -2141,6 +2141,60 @@ ushort razer_attr_read_matrix_brightness(IOUSBDeviceInterface **usb_dev)
     return brightness;
 }
 
+/* Matrix/backlight effects used by the Mamba Tournament Edition.  This older
+ * mouse uses the standard matrix protocol with transaction id 0xff. */
+static ssize_t send_mamba_te_matrix_report(IOUSBDeviceInterface **usb_dev, struct razer_report *report)
+{
+    report->transaction_id.id = 0xFF;
+    struct razer_report response = razer_send_payload(usb_dev, report);
+    return response.status == RAZER_CMD_SUCCESSFUL ? 1 : 0;
+}
+
+ssize_t razer_attr_write_matrix_mode_none(IOUSBDeviceInterface **usb_dev)
+{
+    struct razer_report report = razer_chroma_standard_matrix_effect_none(VARSTORE, BACKLIGHT_LED);
+    return send_mamba_te_matrix_report(usb_dev, &report);
+}
+
+ssize_t razer_attr_write_matrix_mode_spectrum(IOUSBDeviceInterface **usb_dev)
+{
+    struct razer_report report = razer_chroma_standard_matrix_effect_spectrum(VARSTORE, BACKLIGHT_LED);
+    return send_mamba_te_matrix_report(usb_dev, &report);
+}
+
+ssize_t razer_attr_write_matrix_mode_wave(IOUSBDeviceInterface **usb_dev, unsigned char direction)
+{
+    struct razer_report report = razer_chroma_standard_matrix_effect_wave(VARSTORE, BACKLIGHT_LED, direction);
+    return send_mamba_te_matrix_report(usb_dev, &report);
+}
+
+ssize_t razer_attr_write_matrix_mode_static(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count, unsigned char storage)
+{
+    if (count != 3) return 0;
+    struct razer_report report = razer_chroma_standard_matrix_effect_static(storage, BACKLIGHT_LED, (struct razer_rgb *)&buf[0]);
+    return send_mamba_te_matrix_report(usb_dev, &report);
+}
+
+ssize_t razer_attr_write_matrix_mode_reactive(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count)
+{
+    if (count != 4) return 0;
+    struct razer_report report = razer_chroma_standard_matrix_effect_reactive(VARSTORE, BACKLIGHT_LED, buf[0], (struct razer_rgb *)&buf[1]);
+    return send_mamba_te_matrix_report(usb_dev, &report);
+}
+
+ssize_t razer_attr_write_matrix_mode_breath(IOUSBDeviceInterface **usb_dev, const char *buf, size_t count)
+{
+    struct razer_report report = {0};
+    if (count == 3) {
+        report = razer_chroma_standard_matrix_effect_breathing_single(VARSTORE, BACKLIGHT_LED, (struct razer_rgb *)&buf[0]);
+    } else if (count == 6) {
+        report = razer_chroma_standard_matrix_effect_breathing_dual(VARSTORE, BACKLIGHT_LED, (struct razer_rgb *)&buf[0], (struct razer_rgb *)&buf[3]);
+    } else {
+        report = razer_chroma_standard_matrix_effect_breathing_random(VARSTORE, BACKLIGHT_LED);
+    }
+    return send_mamba_te_matrix_report(usb_dev, &report);
+}
+
 /**
  * Read device file "scroll_led_brightness"
  */
