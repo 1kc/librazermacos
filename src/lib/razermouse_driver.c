@@ -976,6 +976,10 @@ ssize_t razer_attr_write_scroll_mode_static_no_store(IOUSBDeviceInterface **usb_
             case USB_DEVICE_ID_RAZER_BASILISK_V2:
             case USB_DEVICE_ID_RAZER_BASILISK_V3:
             case USB_DEVICE_ID_RAZER_BASILISK_V3_35K:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRELESS:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRED:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRELESS:
                 report = razer_chroma_extended_matrix_effect_static(NOSTORE, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
                 report.transaction_id.id = 0x1f;
                 break;
@@ -2030,7 +2034,8 @@ void razer_attr_write_poll_rate(IOUSBDeviceInterface **usb_dev, ushort polling_r
 
 void razer_attr_write_matrix_brightness(IOUSBDeviceInterface **usb_dev, unsigned char brightness)
 {
-    brightness = round(brightness * 2.55);
+    // brightness is a percentage [0-100]; the razer_chroma_* brightness helpers scale it to [0-255]
+    // themselves (except the dock one), so it must not be scaled here as well.
     struct razer_report report = {0};
 
     UInt16 product = -1;
@@ -2038,7 +2043,7 @@ void razer_attr_write_matrix_brightness(IOUSBDeviceInterface **usb_dev, unsigned
 
     switch(product) {
         case USB_DEVICE_ID_RAZER_MAMBA_WIRELESS:
-            report = razer_chroma_misc_set_dock_brightness(brightness);
+            report = razer_chroma_misc_set_dock_brightness(round(brightness * 2.55));
             break;
 
         case USB_DEVICE_ID_RAZER_OROCHI_CHROMA:
@@ -2058,6 +2063,10 @@ void razer_attr_write_matrix_brightness(IOUSBDeviceInterface **usb_dev, unsigned
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
         case USB_DEVICE_ID_RAZER_BASILISK_V3_35K:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRELESS:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRED:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRELESS:
             report = razer_chroma_extended_matrix_brightness(VARSTORE, 0x00, brightness);
             report.transaction_id.id = 0x1F;
             break;
@@ -2112,12 +2121,18 @@ ushort razer_attr_read_matrix_brightness(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_MAMBA_ELITE:
         case USB_DEVICE_ID_RAZER_BASILISK_V3:
         case USB_DEVICE_ID_RAZER_BASILISK_V3_35K:
+        case USB_DEVICE_ID_RAZER_BASILISK_V3_X_HYPERSPEED:
+            report = razer_chroma_extended_matrix_get_brightness(VARSTORE, 0x00);
+            report.transaction_id.id = 0x1F;
+            break;
+
         case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
         case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRELESS:
-        case USB_DEVICE_ID_RAZER_BASILISK_V3_X_HYPERSPEED:
         case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRED:
         case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRELESS:
-            report = razer_chroma_extended_matrix_get_brightness(VARSTORE, 0x00);
+            // LED 0x00 sets every zone but cannot be read back (command failure);
+            // report the logo zone, which LED 0x00 keeps in step with the others.
+            report = razer_chroma_extended_matrix_get_brightness(VARSTORE, LOGO_LED);
             report.transaction_id.id = 0x1F;
             break;
 
