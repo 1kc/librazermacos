@@ -33,6 +33,21 @@
 #define USB_VENDOR_ID_RAZER 0x1532
 #endif
 
+/*
+ * A mouse paired to a Razer Mouse Dock Pro has no USB device of its own: the dock
+ * forwards commands with a transaction id in 0x00-0x1F to the mouse, while 0xE0-0xFF
+ * address the dock itself. Such a mouse is exposed as an extra RazerDevice whose
+ * usbDevice is a proxy around the dock's interface. The driver code sees the mouse's
+ * own (wireless) product id; RazerDevice.productId carries RAZER_DOCKED_MOUSE_ID()
+ * so the paired mouse is distinguishable from the same mouse on its own dongle.
+ */
+#define RAZER_DOCKED_MOUSE_FLAG 0x8000
+#define RAZER_DOCKED_MOUSE_ID(mouse_product_id) (RAZER_DOCKED_MOUSE_FLAG | (mouse_product_id))
+
+// The dock does not report which mouse is paired; the Basilisk V3 Pro 35K is the
+// only one this has been tested with.
+#define RAZER_MOUSE_DOCK_PRO_PAIRED_MOUSE USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRELESS
+
 typedef struct {
     IOUSBDeviceInterface **usbDevice;
     UInt16 productId;

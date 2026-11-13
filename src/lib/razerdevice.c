@@ -1,5 +1,8 @@
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include "razerdevice.h"
+#include "razercommon.h"
 
 bool is_razer_device(IOUSBDeviceInterface **dev)
 {
@@ -386,6 +389,141 @@ void closeRazerUSBDeviceInterface(IOUSBDeviceInterface **dev)
 	kr = (*dev)->Release(dev);
 }
 
+/*
+ * Proxy device for a mouse paired to a Mouse Dock Pro (see razerdevice.h).
+ *
+ * The proxy looks like an IOUSBDeviceInterface** to the driver code: `vtable` must stay
+ * the first member so that &proxy->vtable can be passed around as the interface. Only the
+ * methods librazermacos calls are implemented; they forward to the dock, except that
+ * GetDeviceProduct reports the mouse and outgoing reports are re-addressed to the mouse.
+ */
+typedef struct {
+    IOUSBDeviceInterface *vtable;
+    IOUSBDeviceInterface functions;
+    IOUSBDeviceInterface **dock;
+    UInt16 productId;
+} RazerDockedMouse;
+
+#define RAZER_DOCK_TARGET_MASK 0x1F // transaction ids 0x00-0x1F reach the paired mouse
+
+static IOReturn docked_mouse_get_product(void *self, UInt16 *product)
+{
+    *product = ((RazerDockedMouse *)self)->productId;
+    return kIOReturnSuccess;
+}
+
+static IOReturn docked_mouse_get_vendor(void *self, UInt16 *vendor)
+{
+    IOUSBDeviceInterface **dock = ((RazerDockedMouse *)self)->dock;
+    return (*dock)->GetDeviceVendor(dock, vendor);
+}
+
+static IOReturn docked_mouse_get_release_number(void *self, UInt16 *release)
+{
+    IOUSBDeviceInterface **dock = ((RazerDockedMouse *)self)->dock;
+    return (*dock)->GetDeviceReleaseNumber(dock, release);
+}
+
+static IOReturn docked_mouse_device_request(void *self, IOUSBDevRequest *request)
+{
+    IOUSBDeviceInterface **dock = ((RazerDockedMouse *)self)->dock;
+
+    if (request->bRequest != HID_REQ_SET_REPORT || request->pData == NULL
+        || request->wLength < sizeof(struct razer_report)) {
+        return (*dock)->DeviceRequest(dock, request);
+    }
+
+    // Some commands default to transaction id 0xFF, which the dock would answer itself.
+    // The crc does not cover the transaction id, so it can be changed in place on a copy.
+    struct razer_report report;
+    memcpy(&report, request->pData, sizeof(report));
+    report.transaction_id.id &= RAZER_DOCK_TARGET_MASK;
+
+    IOUSBDevRequest forwarded = *request;
+    forwarded.pData = &report;
+    return (*dock)->DeviceRequest(dock, &forwarded);
+}
+
+static IOReturn docked_mouse_open_close(void *self)
+{
+    // The dock entry owns the USB session.
+    (void)self;
+    return kIOReturnSuccess;
+}
+
+static ULONG docked_mouse_release(void *self)
+{
+    free(self);
+    return 0;
+}
+
+static IOUSBDeviceInterface **create_docked_mouse(IOUSBDeviceInterface **dock, UInt16 productId)
+{
+    RazerDockedMouse *mouse = calloc(1, sizeof(RazerDockedMouse));
+    if (mouse == NULL) {
+        return NULL;
+    }
+    mouse->functions.Release = docked_mouse_release;
+    mouse->functions.USBDeviceOpen = docked_mouse_open_close;
+    mouse->functions.USBDeviceClose = docked_mouse_open_close;
+    mouse->functions.GetDeviceVendor = docked_mouse_get_vendor;
+    mouse->functions.GetDeviceProduct = docked_mouse_get_product;
+    mouse->functions.GetDeviceReleaseNumber = docked_mouse_get_release_number;
+    mouse->functions.DeviceRequest = docked_mouse_device_request;
+    mouse->vtable = &mouse->functions;
+    mouse->dock = dock;
+    mouse->productId = productId;
+    return &mouse->vtable;
+}
+
+/*
+ * Ask for the serial number with the given transaction id, retrying while the dock reports busy.
+ * Returns true and fills serial (23 bytes) when a matching, successful answer arrives.
+ */
+static bool read_serial_through_dock(IOUSBDeviceInterface **dock, unsigned char transaction_id, char *serial)
+{
+    struct razer_report request = get_razer_report(0x00, 0x82, 0x16);
+    struct razer_report response = {0};
+    request.transaction_id.id = transaction_id;
+    request.crc = razer_calculate_crc(&request);
+
+    for (int attempt = 0; attempt < 5; attempt++) {
+        if (razer_get_usb_response(dock, 0x00, &request, 0x00, &response, RAZER_NEW_MOUSE_RECEIVER_WAIT_MIN_US) != kIOReturnSuccess) {
+            return false;
+        }
+        if (response.status != RAZER_CMD_BUSY) {
+            break;
+        }
+        usleep(RAZER_NEW_MOUSE_RECEIVER_WAIT_MIN_US);
+    }
+
+    if (response.status != RAZER_CMD_SUCCESSFUL
+        || response.transaction_id.id != transaction_id
+        || response.command_class != 0x00 || response.command_id.id != 0x82) {
+        return false;
+    }
+    memcpy(serial, response.arguments, 22);
+    serial[22] = '\0';
+    return serial[0] != '\0';
+}
+
+/*
+ * A paired mouse answers on the mouse transaction ids with a serial number of its own.
+ */
+static bool mouse_dock_pro_has_paired_mouse(IOUSBDeviceInterface **dock)
+{
+    char dock_serial[23] = {0};
+    char mouse_serial[23] = {0};
+
+    if (!read_serial_through_dock(dock, 0xFF, dock_serial)) {
+        return false;
+    }
+    if (!read_serial_through_dock(dock, RAZER_DOCK_TARGET_MASK, mouse_serial)) {
+        return false;
+    }
+    return strcmp(dock_serial, mouse_serial) != 0;
+}
+
 RazerDevices getAllRazerDevices()
 {
     RazerDevices allDevices = { .devices = NULL, .size = 0 };
@@ -475,6 +613,24 @@ RazerDevices getAllRazerDevices()
 
         RazerDevice newDevice = { .usbDevice = dev, .internalDeviceId = array_index, .productId = productId };
         razerDevices[array_index] = newDevice;
+
+        if (productId == USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO && mouse_dock_pro_has_paired_mouse(dev))
+        {
+            IOUSBDeviceInterface **mouse = create_docked_mouse(dev, RAZER_MOUSE_DOCK_PRO_PAIRED_MOUSE);
+            if (mouse != NULL)
+            {
+                array_size++;
+                razerDevices = realloc(razerDevices, array_size * sizeof(RazerDevice));
+                array_index++;
+
+                RazerDevice pairedMouse = {
+                    .usbDevice = mouse,
+                    .internalDeviceId = array_index,
+                    .productId = RAZER_DOCKED_MOUSE_ID(RAZER_MOUSE_DOCK_PRO_PAIRED_MOUSE)
+                };
+                razerDevices[array_index] = pairedMouse;
+            }
+        }
     }
 
     IOObjectRelease(iter);
