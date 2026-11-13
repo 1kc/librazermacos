@@ -81,6 +81,19 @@ static struct razer_report razer_send_payload(IOUSBDeviceInterface **usb_dev, st
 }
 
 /**
+ * Switch the device mode (0x00 = normal/hardware effects, 0x03 = driver/custom effects)
+ *
+ * Used by the Mouse Dock Pro, which only answers transaction id 0xFF
+ * (openrazer uses 0x3F here, but the dock replies with a timeout status to that).
+ */
+static void razer_set_device_mode(IOUSBDeviceInterface **usb_dev, unsigned char mode, unsigned char param)
+{
+    struct razer_report report = razer_chroma_standard_set_device_mode(mode, param);
+    report.transaction_id.id = 0xFF;
+    razer_send_payload(usb_dev, &report);
+}
+
+/**
  * Write device file "mode_spectrum"
  *
  * Specrum effect mode is activated whenever the file is written to
@@ -112,6 +125,13 @@ ssize_t razer_accessory_attr_write_mode_spectrum(IOUSBDeviceInterface **usb_dev,
         case USB_DEVICE_ID_RAZER_LAPTOP_STAND_CHROMA:
             report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, ZERO_LED);
             report.transaction_id.id = 0x1F;
+            break;
+
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+            // Must be in normal mode for hardware effects
+            razer_set_device_mode(usb_dev, 0x00, 0x00);
+            report = razer_chroma_extended_matrix_effect_spectrum(VARSTORE, ZERO_LED);
+            report.transaction_id.id = 0xFF;
             break;
 
         default:
@@ -156,6 +176,13 @@ ssize_t razer_accessory_attr_write_mode_none(IOUSBDeviceInterface **usb_dev, con
         case USB_DEVICE_ID_RAZER_LAPTOP_STAND_CHROMA:
             report = razer_chroma_extended_matrix_effect_none(VARSTORE, ZERO_LED);
             report.transaction_id.id = 0x1F;
+            break;
+
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+            // Must be in normal mode for hardware effects
+            razer_set_device_mode(usb_dev, 0x00, 0x00);
+            report = razer_chroma_extended_matrix_effect_none(VARSTORE, ZERO_LED);
+            report.transaction_id.id = 0xFF;
             break;
 
         default:
@@ -227,6 +254,11 @@ ssize_t razer_accessory_attr_write_mode_custom(IOUSBDeviceInterface **usb_dev, c
             report.transaction_id.id = 0x1F;
             break;
 
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+            report = razer_chroma_extended_matrix_effect_custom_frame();
+            report.transaction_id.id = 0xFF;
+            break;
+
         default:
             printf("razeraccessory: Unknown device\n");
             break;
@@ -270,6 +302,25 @@ ssize_t razer_accessory_attr_write_mode_static(IOUSBDeviceInterface **usb_dev, c
             case USB_DEVICE_ID_RAZER_LAPTOP_STAND_CHROMA:
                 report = razer_chroma_extended_matrix_effect_static(VARSTORE, ZERO_LED, (struct razer_rgb*) & buf[0]);
                 report.transaction_id.id = 0x1F;
+                break;
+
+            case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+                // Must be in normal mode for hardware effects
+                razer_set_device_mode(usb_dev, 0x00, 0x00);
+
+                // As in openrazer: the colour has to be set twice with a mode switch in between,
+                // otherwise every subsequent static effect shows the previous colour.
+                report = razer_chroma_extended_matrix_effect_static(VARSTORE, ZERO_LED, (struct razer_rgb*) & buf[0]);
+                report.transaction_id.id = 0xFF;
+                razer_send_payload(usb_dev, &report);
+
+                report = get_razer_report(0x0f, 0x02, 0x06);
+                report.arguments[2] = 0x08;
+                report.transaction_id.id = 0xFF;
+                razer_send_payload(usb_dev, &report);
+
+                report = razer_chroma_extended_matrix_effect_static(VARSTORE, ZERO_LED, (struct razer_rgb*) & buf[0]);
+                report.transaction_id.id = 0xFF;
                 break;
 
             default:
@@ -320,7 +371,15 @@ ssize_t razer_accessory_attr_write_mode_wave(IOUSBDeviceInterface **usb_dev, con
             report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, speed);
             report.transaction_id.id = 0x1F;
             break;
-        /* Fall through */
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+            // Must be in normal mode for hardware effects
+            razer_set_device_mode(usb_dev, 0x00, 0x00);
+            // Direction values are flipped compared to other devices
+            direction ^= ((1<<0) | (1<<1));
+            report = razer_chroma_extended_matrix_effect_wave(VARSTORE, ZERO_LED, direction, speed);
+            report.transaction_id.id = 0xFF;
+            break;
+
         case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
             // Direction values are flipped compared to other devices
             direction ^= ((1<<0) | (1<<1));
@@ -393,6 +452,25 @@ ssize_t razer_accessory_attr_write_mode_breath(IOUSBDeviceInterface **usb_dev, c
                     report.transaction_id.id = 0x1F;
                     break;
             }
+            break;
+
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+            // Must be in normal mode for hardware effects
+            razer_set_device_mode(usb_dev, 0x00, 0x00);
+            switch(count) {
+                case 3: // Single colour mode
+                    report = razer_chroma_extended_matrix_effect_breathing_single(VARSTORE, ZERO_LED, (struct razer_rgb *)&buf[0]);
+                    break;
+
+                case 6: // Dual colour mode
+                    report = razer_chroma_extended_matrix_effect_breathing_dual(VARSTORE, ZERO_LED, (struct razer_rgb *)&buf[0], (struct razer_rgb *)&buf[3]);
+                    break;
+
+                default: // "Random" colour mode
+                    report = razer_chroma_extended_matrix_effect_breathing_random(VARSTORE, ZERO_LED);
+                    break;
+            }
+            report.transaction_id.id = 0xFF;
             break;
 
         case USB_DEVICE_ID_RAZER_CHROMA_MUG:
@@ -510,6 +588,11 @@ ssize_t razer_accessory_attr_write_set_brightness(IOUSBDeviceInterface **usb_dev
             report.transaction_id.id = 0x1F;
             break;
 
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
+            report = razer_chroma_extended_matrix_brightness(VARSTORE, ZERO_LED, brightness);
+            report.transaction_id.id = 0xFF;
+            break;
+
         case USB_DEVICE_ID_RAZER_CHROMA_MUG:
             report = razer_chroma_standard_set_led_brightness(VARSTORE, BACKLIGHT_LED, brightness);
             break;
@@ -551,6 +634,7 @@ ushort razer_accessory_attr_read_set_brightness(IOUSBDeviceInterface **usb_dev)
         case USB_DEVICE_ID_RAZER_THUNDERBOLT_4_DOCK_CHROMA:
         case USB_DEVICE_ID_RAZER_LAPTOP_STAND_CHROMA:
         case USB_DEVICE_ID_RAZER_MOUSE_DOCK:
+        case USB_DEVICE_ID_RAZER_MOUSE_DOCK_PRO:
             break;
 
         default:
