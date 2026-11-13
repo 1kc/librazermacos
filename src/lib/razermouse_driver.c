@@ -976,6 +976,10 @@ ssize_t razer_attr_write_scroll_mode_static_no_store(IOUSBDeviceInterface **usb_
             case USB_DEVICE_ID_RAZER_BASILISK_V2:
             case USB_DEVICE_ID_RAZER_BASILISK_V3:
             case USB_DEVICE_ID_RAZER_BASILISK_V3_35K:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRED:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_WIRELESS:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRED:
+            case USB_DEVICE_ID_RAZER_BASILISK_V3_PRO_35K_WIRELESS:
                 report = razer_chroma_extended_matrix_effect_static(NOSTORE, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
                 report.transaction_id.id = 0x1f;
                 break;
