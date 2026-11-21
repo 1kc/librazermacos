@@ -660,6 +660,28 @@ ssize_t razer_attr_write_right_mode_wave(IOUSBDeviceInterface **usb_dev, const c
 }
 
 /**
+ * DeathAdder Chroma (0x0043): static colour on one LED with the "standard" commands,
+ * transaction id 0x3F: LED on, set RGB, set effect to static (sequence tested on the device).
+ * Uses VARSTORE in the no_store variants too; NOSTORE hasn't been tried on this mouse.
+ */
+static void deathadder_chroma_set_static(IOUSBDeviceInterface **usb_dev, unsigned char led, struct razer_rgb *rgb)
+{
+    struct razer_report report;
+
+    report = razer_chroma_standard_set_led_state(VARSTORE, led, ON);
+    report.transaction_id.id = 0x3F;
+    razer_send_payload(usb_dev, &report);
+
+    report = razer_chroma_standard_set_led_rgb(VARSTORE, led, rgb);
+    report.transaction_id.id = 0x3F;
+    razer_send_payload(usb_dev, &report);
+
+    report = razer_chroma_standard_set_led_effect(VARSTORE, led, LED_STATIC);
+    report.transaction_id.id = 0x3F;
+    razer_send_payload(usb_dev, &report);
+}
+
+/**
  * Write device file "logo_mode_static" (for extended mouse matrix effects)
  *
  * Set the mouse to static mode when 3 RGB bytes are written
@@ -725,6 +747,10 @@ ssize_t razer_attr_write_logo_mode_static(IOUSBDeviceInterface **usb_dev, const 
             report = razer_chroma_standard_set_led_rgb(VARSTORE, LOGO_LED, (struct razer_rgb*)&buf[0]);
             report.transaction_id.id = 0x3F;
             break;
+        case USB_DEVICE_ID_RAZER_DEATHADDER_CHROMA:
+            deathadder_chroma_set_static(usb_dev, LOGO_LED, (struct razer_rgb*)&buf[0]);
+            return count;
+
         default:
             printf("razermouse: logo_mode_static not supported for this model\n");
             return count;
@@ -804,6 +830,10 @@ ssize_t razer_attr_write_scroll_mode_static(IOUSBDeviceInterface **usb_dev, cons
                 report = razer_chroma_standard_set_led_rgb(VARSTORE, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
                 report.transaction_id.id = 0x3F;
                 break;
+
+            case USB_DEVICE_ID_RAZER_DEATHADDER_CHROMA:
+                deathadder_chroma_set_static(usb_dev, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
+                return count;
 
             default:
                 printf("razermouse: logo_mode_static not supported for this model\n");
@@ -908,6 +938,10 @@ ssize_t razer_attr_write_logo_mode_static_no_store(IOUSBDeviceInterface **usb_de
             report.transaction_id.id = 0x1f;
             break;
 
+        case USB_DEVICE_ID_RAZER_DEATHADDER_CHROMA:
+            deathadder_chroma_set_static(usb_dev, LOGO_LED, (struct razer_rgb*)&buf[0]);
+            return count;
+
         default:
             printf("razermouse: logo_mode_static not supported for this model\n");
             return count;
@@ -983,6 +1017,10 @@ ssize_t razer_attr_write_scroll_mode_static_no_store(IOUSBDeviceInterface **usb_
                 report = razer_chroma_standard_set_led_rgb(NOSTORE, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
                 report.transaction_id.id = 0x3F;
                 break;
+
+            case USB_DEVICE_ID_RAZER_DEATHADDER_CHROMA:
+                deathadder_chroma_set_static(usb_dev, SCROLL_WHEEL_LED, (struct razer_rgb*)&buf[0]);
+                return count;
 
             default:
                 printf("razermouse: logo_mode_static not supported for this model\n");
